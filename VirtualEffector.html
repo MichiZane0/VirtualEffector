@@ -3,16 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Virtual Stompbox Effector</title>
+<title>Cute Virtual Effector Board</title>
 <style>
-    /* 全体設定：見やすさと文字のオーバーフロー防止 */
+    /* 全体設定：可愛さと見やすさの両立、文字のオーバーフロー防止 */
     * {
         box-sizing: border-box;
     }
     body {
-        font-family: 'Segoe UI', Meiryo, sans-serif;
-        background-color: #1e1e1e;
-        color: #f0f0f0;
+        font-family: 'Nunito', 'Segoe UI', Meiryo, sans-serif;
+        background-color: #fff0f5;
+        color: #555;
         margin: 0;
         padding: 20px;
         display: flex;
@@ -20,121 +20,259 @@
         align-items: center;
     }
     h1 {
-        font-size: 24px;
+        font-size: 28px;
         margin-bottom: 20px;
         text-align: center;
+        color: #ff82ab;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
         word-break: keep-all;
     }
 
-    /* コントロールパネル (I/O) */
-    .control-panel {
-        background: #2d2d2d;
-        padding: 15px;
-        border-radius: 8px;
-        border: 1px solid #444;
+    /* コントロールパネル (I/O, Waveform) */
+    .header-panel {
+        background: #ffffff;
+        padding: 20px;
+        border-radius: 20px;
+        border: 3px solid #ffb6c1;
         width: 100%;
-        max-width: 800px;
-        margin-bottom: 30px;
+        max-width: 900px;
+        margin-bottom: 20px;
         display: flex;
         flex-wrap: wrap;
-        gap: 15px;
-        align-items: center;
-        justify-content: space-between;
+        gap: 20px;
+        box-shadow: 0 10px 20px rgba(255, 182, 193, 0.3);
     }
+    
+    .io-section {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        min-width: 250px;
+    }
+
     .device-select {
         display: flex;
         flex-direction: column;
         gap: 5px;
-        flex: 1;
-        min-width: 200px;
     }
     .device-select label {
-        font-size: 13px;
-        color: #bbb;
+        font-size: 14px;
+        font-weight: bold;
+        color: #ff69b4;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
     }
     select, button {
-        padding: 8px 12px;
-        background: #444;
-        color: #fff;
-        border: 1px solid #666;
-        border-radius: 4px;
+        padding: 10px 15px;
+        background: #fff;
+        color: #555;
+        border: 2px solid #ffb6c1;
+        border-radius: 12px;
         font-size: 14px;
+        font-weight: bold;
         cursor: pointer;
         max-width: 100%;
+        transition: all 0.2s ease;
     }
     select:focus, button:focus {
         outline: none;
-        border-color: #888;
+        border-color: #ff69b4;
+        box-shadow: 0 0 5px rgba(255, 105, 180, 0.4);
     }
+    button:hover {
+        background: #ffe4e1;
+    }
+    
     button.play-btn {
-        background: #27ae60;
-        border-color: #2ecc71;
-        font-weight: bold;
-        flex: 1;
-        min-width: 200px;
+        background: #ffb6c1;
+        color: white;
+        border-color: #ff82ab;
         height: 50px;
     }
     button.play-btn.playing {
-        background: #e74c3c;
-        border-color: #c0392b;
+        background: #ff69b4;
+        border-color: #d11a2a;
     }
 
-    /* エフェクターボード */
-    .pedal-board {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 20px;
-        justify-content: center;
-        width: 100%;
-        max-width: 1000px;
-        padding: 20px;
-        background: #111;
-        border-radius: 12px;
-        box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
-    }
-
-    /* ペダル共通デザイン */
-    .pedal {
-        width: 160px;
-        height: 280px;
-        border-radius: 10px;
+    /* 波形プレビュー */
+    .preview-section {
+        flex: 1;
         display: flex;
         flex-direction: column;
         align-items: center;
-        padding: 15px 10px;
-        box-shadow: 5px 5px 15px rgba(0,0,0,0.5), inset -2px -2px 10px rgba(0,0,0,0.2), inset 2px 2px 10px rgba(255,255,255,0.2);
+        min-width: 300px;
+        max-width: 100%;
+        overflow: hidden;
+    }
+    .preview-label {
+        font-size: 14px;
+        font-weight: bold;
+        color: #ff69b4;
+        margin-bottom: 5px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 100%;
+        text-align: center;
+    }
+    canvas {
+        background: #ffe4e1;
+        border: 3px solid #ffb6c1;
+        border-radius: 15px;
+        width: 100%;
+        height: 100px;
+        box-shadow: inset 0 3px 6px rgba(0,0,0,0.1);
+    }
+
+    /* ワークスペース全体 (パレットとボード) */
+    .workspace {
+        display: flex;
+        flex-wrap: wrap;
+        width: 100%;
+        max-width: 1100px;
+        gap: 20px;
+    }
+
+    /* エフェクターパレット (追加用) */
+    .palette {
+        flex: 1;
+        min-width: 200px;
+        max-width: 300px;
+        background: #ffffff;
+        border: 3px dashed #ffb6c1;
+        border-radius: 20px;
+        padding: 15px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .palette-title {
+        font-weight: bold;
+        color: #ff69b4;
+        text-align: center;
+        margin-bottom: 10px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .palette-item {
+        background: #fdf5e6;
+        border: 2px solid #ffdab9;
+        border-radius: 10px;
+        padding: 10px;
+        text-align: center;
+        font-weight: bold;
+        cursor: grab;
+        color: #555;
+        transition: transform 0.1s;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .palette-item:active {
+        cursor: grabbing;
+    }
+    .palette-item:hover {
+        transform: scale(1.02);
+    }
+
+    /* エフェクターボード */
+    .board-container {
+        flex: 3;
+        min-width: 300px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .board {
+        background: #fff;
+        border: 3px solid #ffb6c1;
+        border-radius: 20px;
+        min-height: 320px;
+        padding: 20px;
+        display: flex;
+        gap: 15px;
+        overflow-x: auto;
+        box-shadow: 0 10px 20px rgba(255, 182, 193, 0.2);
+        align-items: center;
+    }
+    .board.drag-over {
+        background: #ffe4e1;
+        border-style: dashed;
+    }
+
+    /* ゴミ箱 */
+    .trash-bin {
+        background: #ffe4e1;
+        border: 3px dashed #ff82ab;
+        border-radius: 15px;
+        padding: 15px;
+        text-align: center;
+        font-weight: bold;
+        color: #d11a2a;
+        transition: background 0.2s;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .trash-bin.drag-over {
+        background: #ffb6c1;
+        color: #fff;
+    }
+
+    /* ペダル共通デザイン (可愛く) */
+    .pedal {
+        min-width: 150px;
+        width: 150px;
+        height: 260px;
+        border-radius: 15px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 12px 10px;
+        box-shadow: 3px 5px 10px rgba(0,0,0,0.1), inset -2px -2px 8px rgba(0,0,0,0.05), inset 2px 2px 8px rgba(255,255,255,0.4);
         position: relative;
+        cursor: grab;
+        flex-shrink: 0;
+    }
+    .pedal:active {
+        cursor: grabbing;
     }
     .pedal-title {
-        font-weight: bold;
-        font-size: 16px;
-        margin-bottom: 15px;
-        color: #222;
-        text-shadow: 1px 1px 0px rgba(255,255,255,0.3);
+        font-weight: 800;
+        font-size: 14px;
+        margin-bottom: 10px;
+        color: #444;
         text-align: center;
         width: 100%;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        background: rgba(255,255,255,0.5);
+        border-radius: 8px;
+        padding: 2px 5px;
     }
 
-    /* ペダルカラー設定 */
-    .pedal.od { background: linear-gradient(135deg, #f1c40f, #f39c12); }
-    .pedal.dist { background: linear-gradient(135deg, #e67e22, #d35400); }
-    .pedal.fuzz { background: linear-gradient(135deg, #95a5a6, #7f8c8d); }
-    .pedal.delay { background: linear-gradient(135deg, #ecf0f1, #bdc3c7); }
+    /* ペダルカラー設定 (パステル) */
+    .pedal.od { background: #ffe4b5; border: 2px solid #ffdead; }
+    .pedal.dist { background: #ffdab9; border: 2px solid #ffc0cb; }
+    .pedal.fuzz { background: #dcdcdc; border: 2px solid #c0c0c0; }
+    .pedal.delay { background: #e0ffff; border: 2px solid #afeeee; }
+    .pedal.chorus { background: #e6e6fa; border: 2px solid #d8bfd8; }
+    .pedal.tremolo { background: #98fb98; border: 2px solid #90ee90; }
+    .pedal.reverb { background: #ffb6c1; border: 2px solid #ff69b4; }
 
     /* ノブセクション */
     .knobs-container {
         display: flex;
         flex-wrap: wrap;
         justify-content: center;
-        gap: 10px;
+        gap: 8px;
         width: 100%;
         flex-grow: 1;
+        overflow: hidden;
     }
     .knob-group {
         display: flex;
@@ -143,9 +281,9 @@
         width: 45%;
     }
     .knob-label {
-        font-size: 11px;
-        color: #222;
-        font-weight: bold;
+        font-size: 10px;
+        color: #444;
+        font-weight: 800;
         margin-bottom: 2px;
         white-space: nowrap;
         overflow: hidden;
@@ -153,7 +291,7 @@
         max-width: 100%;
     }
     
-    /* スライダー（ノブの代用） */
+    /* 可愛いスライダー */
     input[type=range] {
         -webkit-appearance: none;
         width: 100%;
@@ -164,24 +302,25 @@
     }
     input[type=range]::-webkit-slider-runnable-track {
         width: 100%;
-        height: 6px;
+        height: 8px;
         cursor: pointer;
-        background: #222;
-        border-radius: 3px;
-        border: 1px solid #444;
+        background: rgba(255,255,255,0.6);
+        border-radius: 4px;
+        border: 1px solid rgba(0,0,0,0.1);
     }
     input[type=range]::-webkit-slider-thumb {
-        height: 16px;
-        width: 16px;
+        height: 18px;
+        width: 18px;
         border-radius: 50%;
-        background: #eee;
-        border: 2px solid #333;
+        background: #fff;
+        border: 3px solid #ff69b4;
         cursor: pointer;
         -webkit-appearance: none;
         margin-top: -6px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
     }
 
-    /* フットスイッチ */
+    /* フットスイッチ (丸くて可愛い) */
     .footswitch-container {
         margin-top: auto;
         display: flex;
@@ -189,145 +328,86 @@
         align-items: center;
     }
     .led {
-        width: 12px;
-        height: 12px;
+        width: 14px;
+        height: 14px;
         border-radius: 50%;
-        background-color: #333;
-        border: 2px solid #222;
-        margin-bottom: 10px;
-        box-shadow: inset 0px 1px 3px rgba(0,0,0,0.5);
+        background-color: #ddd;
+        border: 2px solid #aaa;
+        margin-bottom: 8px;
+        box-shadow: inset 0px 1px 3px rgba(0,0,0,0.2);
     }
     .led.active {
         background-color: #ff3b30;
-        box-shadow: 0 0 10px #ff3b30, inset 0px 1px 3px rgba(0,0,0,0.5);
+        border-color: #ffb6c1;
+        box-shadow: 0 0 8px #ff3b30, inset 0px 1px 3px rgba(0,0,0,0.2);
     }
     .footswitch {
-        width: 40px;
-        height: 40px;
+        width: 36px;
+        height: 36px;
         border-radius: 50%;
-        background: radial-gradient(circle, #ddd, #888);
-        border: 2px solid #555;
-        box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+        background: radial-gradient(circle, #fff, #ddd);
+        border: 2px solid #ccc;
+        box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
         cursor: pointer;
         outline: none;
         position: relative;
+        transition: transform 0.1s;
     }
     .footswitch:active {
-        box-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        box-shadow: 1px 1px 2px rgba(0,0,0,0.1);
         transform: translateY(2px);
     }
-
 </style>
 </head>
 <body>
 
-    <h1>Virtual Stompbox Effector</h1>
+    <h1>✨ Cute Virtual Effector Board ✨</h1>
 
-    <!-- コントロールパネル -->
-    <div class="control-panel">
-        <div class="device-select">
-            <label for="audio-input">Input Device (Audio Interface / Mic)</label>
-            <select id="audio-input">
-                <option value="none">-- Select Input --</option>
-            </select>
+    <!-- 制御パネル -->
+    <div class="header-panel">
+        <div class="io-section">
+            <div class="device-select">
+                <label for="audio-input">🎤 Input Device</label>
+                <select id="audio-input">
+                    <option value="none">-- Select Input --</option>
+                </select>
+            </div>
+            <div class="device-select">
+                <label for="audio-output">🎧 Output Device</label>
+                <select id="audio-output">
+                    <option value="default">Default Output</option>
+                </select>
+            </div>
+            <button id="play-preset-btn" class="play-btn">🎸 Play Guitar Preset</button>
         </div>
-        <div class="device-select">
-            <label for="audio-output">Output Device (Speakers / Headphones)</label>
-            <select id="audio-output">
-                <option value="default">Default Output</option>
-            </select>
+        <div class="preview-section">
+            <div class="preview-label">〰️ Input Waveform Preview</div>
+            <canvas id="oscilloscope"></canvas>
         </div>
-        <button id="play-preset-btn" class="play-btn">Play Default Guitar Preset</button>
     </div>
 
-    <!-- エフェクターボード -->
-    <div class="pedal-board">
+    <!-- ワークスペース -->
+    <div class="workspace">
         
-        <!-- Overdrive -->
-        <div class="pedal od">
-            <div class="pedal-title">OVERDRIVE</div>
-            <div class="knobs-container">
-                <div class="knob-group">
-                    <span class="knob-label">DRIVE</span>
-                    <input type="range" id="od-drive" min="1" max="50" value="10">
-                </div>
-                <div class="knob-group">
-                    <span class="knob-label">TONE</span>
-                    <input type="range" id="od-tone" min="200" max="5000" value="2000">
-                </div>
-                <div class="knob-group">
-                    <span class="knob-label">LEVEL</span>
-                    <input type="range" id="od-level" min="0" max="2" step="0.1" value="1">
-                </div>
-            </div>
-            <div class="footswitch-container">
-                <div id="od-led" class="led"></div>
-                <button id="od-switch" class="footswitch"></button>
-            </div>
+        <!-- エフェクター追加パレット -->
+        <div class="palette" id="palette">
+            <div class="palette-title">➕ Add Pedals (Drag me!)</div>
+            <div class="palette-item" draggable="true" data-type="od">Overdrive</div>
+            <div class="palette-item" draggable="true" data-type="dist">Distortion</div>
+            <div class="palette-item" draggable="true" data-type="fuzz">Fuzz</div>
+            <div class="palette-item" draggable="true" data-type="delay">Delay</div>
+            <div class="palette-item" draggable="true" data-type="chorus">Chorus</div>
+            <div class="palette-item" draggable="true" data-type="tremolo">Tremolo</div>
+            <div class="palette-item" draggable="true" data-type="reverb">Reverb</div>
         </div>
 
-        <!-- Distortion -->
-        <div class="pedal dist">
-            <div class="pedal-title">DISTORTION</div>
-            <div class="knobs-container">
-                <div class="knob-group">
-                    <span class="knob-label">DIST</span>
-                    <input type="range" id="dist-dist" min="10" max="100" value="50">
-                </div>
-                <div class="knob-group">
-                    <span class="knob-label">TONE</span>
-                    <input type="range" id="dist-tone" min="200" max="5000" value="1500">
-                </div>
-                <div class="knob-group">
-                    <span class="knob-label">LEVEL</span>
-                    <input type="range" id="dist-level" min="0" max="2" step="0.1" value="1">
-                </div>
+        <!-- ボードとゴミ箱 -->
+        <div class="board-container">
+            <div class="board" id="board">
+                <!-- ドロップされたペダルがここに並びます -->
             </div>
-            <div class="footswitch-container">
-                <div id="dist-led" class="led"></div>
-                <button id="dist-switch" class="footswitch"></button>
-            </div>
-        </div>
-
-        <!-- Fuzz -->
-        <div class="pedal fuzz">
-            <div class="pedal-title">FUZZ</div>
-            <div class="knobs-container">
-                <div class="knob-group">
-                    <span class="knob-label">FUZZ</span>
-                    <input type="range" id="fuzz-fuzz" min="10" max="150" value="80">
-                </div>
-                <div class="knob-group" style="width: 100%;"> <!-- 中央に配置 -->
-                    <span class="knob-label">VOLUME</span>
-                    <input type="range" id="fuzz-level" min="0" max="2" step="0.1" value="1">
-                </div>
-            </div>
-            <div class="footswitch-container">
-                <div id="fuzz-led" class="led"></div>
-                <button id="fuzz-switch" class="footswitch"></button>
-            </div>
-        </div>
-
-        <!-- Delay -->
-        <div class="pedal delay">
-            <div class="pedal-title">DIGITAL DELAY</div>
-            <div class="knobs-container">
-                <div class="knob-group">
-                    <span class="knob-label">TIME</span>
-                    <input type="range" id="delay-time" min="0.05" max="1.0" step="0.01" value="0.3">
-                </div>
-                <div class="knob-group">
-                    <span class="knob-label">F.BACK</span>
-                    <input type="range" id="delay-feedback" min="0" max="0.9" step="0.05" value="0.4">
-                </div>
-                <div class="knob-group" style="width: 100%;">
-                    <span class="knob-label">E.LEVEL</span>
-                    <input type="range" id="delay-level" min="0" max="1" step="0.05" value="0.5">
-                </div>
-            </div>
-            <div class="footswitch-container">
-                <div id="delay-led" class="led"></div>
-                <button id="delay-switch" class="footswitch"></button>
+            <div class="trash-bin" id="trash-bin">
+                🗑️ Drag here to Delete
             </div>
         </div>
 
@@ -338,228 +418,460 @@
 
 <script>
     let audioCtx;
+    let masterInputNode;
+    let masterOutputNode;
+    let analyser;
+    
     let inputStream;
     let inputSource;
     let presetSource;
-    let presetBuffer;
     let isPlayingPreset = false;
 
-    // Effect Nodes Definition
-    const effects = {
-        od: { active: false, inNode: null, outNode: null, wetGain: null, dryGain: null },
-        dist: { active: false, inNode: null, outNode: null, wetGain: null, dryGain: null },
-        fuzz: { active: false, inNode: null, outNode: null, wetGain: null, dryGain: null },
-        delay: { active: false, inNode: null, outNode: null, wetGain: null, dryGain: null }
-    };
+    // ペダルのインスタンスを管理する配列
+    let activePedals = [];
+    let pedalCounter = 0;
 
-    // --- Web Audio 初期化とルーティング ---
+    // --- Web Audio 初期化 ---
     async function initAudioContext() {
         if (!audioCtx) {
             audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            await buildEffectChain();
-            generateGuitarBuffer();
+            
+            masterInputNode = audioCtx.createGain();
+            masterOutputNode = audioCtx.createGain();
+            
+            // アナライザーの設定（インプット波形プレビュー用）
+            analyser = audioCtx.createAnalyser();
+            analyser.fftSize = 2048;
+            masterInputNode.connect(analyser); // 入力を常に監視
+
+            // 出力ルーティング
+            const destStream = audioCtx.createMediaStreamDestination();
+            masterOutputNode.connect(destStream);
+            masterOutputNode.connect(audioCtx.destination);
+            document.getElementById('audio-out-element').srcObject = destStream;
+
+            drawOscilloscope();
+            rebuildAudioChain();
+        }
+        if (audioCtx.state === 'suspended') {
+            await audioCtx.resume();
         }
     }
 
-    async function buildEffectChain() {
-        // マスター出力先の設定（デバイス選択用）
-        const destStream = audioCtx.createMediaStreamDestination();
-        const audioElement = document.getElementById('audio-out-element');
-        audioElement.srcObject = destStream;
+    // --- 波形描画 ---
+    function drawOscilloscope() {
+        const canvas = document.getElementById('oscilloscope');
+        const canvasCtx = canvas.getContext('2d');
+        const bufferLength = analyser.frequencyBinCount;
+        const dataArray = new Uint8Array(bufferLength);
 
-        // ノード作成
-        // 1. Overdrive (Soft clipping + Tone)
-        effects.od.ws = audioCtx.createWaveShaper();
-        effects.od.filter = audioCtx.createBiquadFilter();
-        effects.od.filter.type = 'lowpass';
-        updateODCurve();
-        
-        // 2. Distortion (Hard clipping + Tone)
-        effects.dist.ws = audioCtx.createWaveShaper();
-        effects.dist.filter = audioCtx.createBiquadFilter();
-        effects.dist.filter.type = 'lowpass';
-        updateDistCurve();
+        function draw() {
+            requestAnimationFrame(draw);
+            // 描画領域をブラウザのサイズに合わせて動的に調整
+            canvas.width = canvas.clientWidth;
+            canvas.height = canvas.clientHeight;
 
-        // 3. Fuzz (Asymmetrical clipping)
-        effects.fuzz.ws = audioCtx.createWaveShaper();
-        updateFuzzCurve();
+            analyser.getByteTimeDomainData(dataArray);
 
-        // 4. Delay
-        effects.delay.delayNode = audioCtx.createDelay(2.0);
-        effects.delay.feedbackGain = audioCtx.createGain();
-        effects.delay.delayNode.connect(effects.delay.feedbackGain);
-        effects.delay.feedbackGain.connect(effects.delay.delayNode);
-        updateDelayParams();
+            canvasCtx.fillStyle = '#ffe4e1'; // 背景色
+            canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // 各エフェクトの Wet/Dry バイパス構造を作成
-        const chainOrder = ['od', 'dist', 'fuzz', 'delay'];
-        let prevNode = null;
+            canvasCtx.lineWidth = 2;
+            canvasCtx.strokeStyle = '#ff69b4';
+            canvasCtx.beginPath();
 
-        chainOrder.forEach((name, index) => {
-            const fx = effects[name];
-            fx.inNode = audioCtx.createGain();
-            fx.outNode = audioCtx.createGain();
-            fx.wetGain = audioCtx.createGain();
-            fx.dryGain = audioCtx.createGain();
-            fx.levelGain = audioCtx.createGain(); // マスターレベル
+            const sliceWidth = canvas.width * 1.0 / bufferLength;
+            let x = 0;
 
-            // Bypass Routing
-            fx.inNode.connect(fx.dryGain);
-            fx.dryGain.connect(fx.outNode);
-            
-            // Effect Routing
-            if (name === 'od') {
-                fx.inNode.connect(fx.ws);
-                fx.ws.connect(fx.filter);
-                fx.filter.connect(fx.levelGain);
-            } else if (name === 'dist') {
-                fx.inNode.connect(fx.ws);
-                fx.ws.connect(fx.filter);
-                fx.filter.connect(fx.levelGain);
-            } else if (name === 'fuzz') {
-                fx.inNode.connect(fx.ws);
-                fx.ws.connect(fx.levelGain);
-            } else if (name === 'delay') {
-                // ディレイは原音+エフェクト音
-                fx.inNode.connect(fx.delayNode);
-                fx.delayNode.connect(fx.levelGain); // wet sound
-                fx.inNode.connect(fx.wetGain); // Direct sound passthrough for wet mix
+            for (let i = 0; i < bufferLength; i++) {
+                const v = dataArray[i] / 128.0;
+                const y = v * canvas.height / 2;
+
+                if (i === 0) canvasCtx.moveTo(x, y);
+                else canvasCtx.lineTo(x, y);
+
+                x += sliceWidth;
             }
-            
-            if(name === 'delay') {
-                fx.levelGain.connect(fx.wetGain);
-            } else {
-                fx.levelGain.connect(fx.wetGain);
-            }
-            
-            fx.wetGain.connect(fx.outNode);
-
-            // 初期状態はOFF
-            fx.wetGain.gain.value = 0;
-            fx.dryGain.gain.value = 1;
-
-            if (prevNode) {
-                prevNode.connect(fx.inNode);
-            } else {
-                // チェーンの先頭用のダミーノード
-                effects.chainInput = fx.inNode; 
-            }
-            prevNode = fx.outNode;
-        });
-
-        // 最終出力をMediaStreamDestinationへ
-        prevNode.connect(destStream);
-        
-        // 念のためデフォルトのDestinationにも繋ぐ（ブラウザによっては必要）
-        prevNode.connect(audioCtx.destination);
+            canvasCtx.lineTo(canvas.width, canvas.height / 2);
+            canvasCtx.stroke();
+        }
+        draw();
     }
 
-    // --- カーブ生成関数 ---
+    // --- カーブ生成（歪み系用） ---
     function makeDistortionCurve(amount, type) {
         const k = typeof amount === 'number' ? amount : 50;
         const n_samples = 44100;
         const curve = new Float32Array(n_samples);
         const deg = Math.PI / 180;
-
         for (let i = 0; i < n_samples; ++i) {
             let x = i * 2 / n_samples - 1;
             if (type === 'soft') {
-                // Tanh based soft clipping
                 curve[i] = Math.tanh(x * k) / Math.tanh(k);
             } else if (type === 'hard') {
-                // Hard clipping
                 curve[i] = (3 + k) * x * 20 * deg / (Math.PI + k * Math.abs(x));
             } else if (type === 'asym') {
-                // Fuzz - Asymmetrical
                 let val = x * k;
-                if (val > 0) {
-                    curve[i] = val > 0.8 ? 0.8 : val;
-                } else {
-                    curve[i] = val < -1.0 ? -1.0 : val;
-                }
+                curve[i] = val > 0 ? (val > 0.8 ? 0.8 : val) : (val < -1.0 ? -1.0 : val);
             }
         }
         return curve;
     }
 
-    function updateODCurve() {
-        if(!effects.od.ws) return;
-        const drive = parseFloat(document.getElementById('od-drive').value);
-        effects.od.ws.curve = makeDistortionCurve(drive, 'soft');
-        effects.od.filter.frequency.value = parseFloat(document.getElementById('od-tone').value);
-        effects.od.levelGain.gain.value = parseFloat(document.getElementById('od-level').value);
-    }
-    
-    function updateDistCurve() {
-        if(!effects.dist.ws) return;
-        const drive = parseFloat(document.getElementById('dist-dist').value);
-        effects.dist.ws.curve = makeDistortionCurve(drive, 'hard');
-        effects.dist.filter.frequency.value = parseFloat(document.getElementById('dist-tone').value);
-        effects.dist.levelGain.gain.value = parseFloat(document.getElementById('dist-level').value);
-    }
-
-    function updateFuzzCurve() {
-        if(!effects.fuzz.ws) return;
-        const drive = parseFloat(document.getElementById('fuzz-fuzz').value);
-        effects.fuzz.ws.curve = makeDistortionCurve(drive / 10, 'asym');
-        effects.fuzz.levelGain.gain.value = parseFloat(document.getElementById('fuzz-level').value);
+    // --- リバーブのインパルスレスポンス生成 ---
+    function createReverbImpulse(duration = 2, decay = 2) {
+        const sampleRate = audioCtx.sampleRate;
+        const length = sampleRate * duration;
+        const impulse = audioCtx.createBuffer(2, length, sampleRate);
+        const left = impulse.getChannelData(0);
+        const right = impulse.getChannelData(1);
+        for (let i = 0; i < length; i++) {
+            const n = 1 - (i / length);
+            const env = Math.pow(n, decay);
+            left[i] = (Math.random() * 2 - 1) * env;
+            right[i] = (Math.random() * 2 - 1) * env;
+        }
+        return impulse;
     }
 
-    function updateDelayParams() {
-        if(!effects.delay.delayNode) return;
-        effects.delay.delayNode.delayTime.value = parseFloat(document.getElementById('delay-time').value);
-        effects.delay.feedbackGain.gain.value = parseFloat(document.getElementById('delay-feedback').value);
-        effects.delay.levelGain.gain.value = parseFloat(document.getElementById('delay-level').value);
-    }
+    // --- ペダルファクトリー (動的生成) ---
+    function createPedalInstance(type) {
+        pedalCounter++;
+        const id = 'pedal_' + pedalCounter;
+        
+        // --- UI生成 ---
+        const el = document.createElement('div');
+        el.className = `pedal ${type}`;
+        el.draggable = true;
+        el.id = id;
+        el.dataset.type = type;
 
-    // イベントリスナーの登録
-    ['od', 'dist', 'fuzz', 'delay'].forEach(name => {
-        // Toggle Switch
-        document.getElementById(`${name}-switch`).addEventListener('click', async () => {
-            await initAudioContext();
-            if(audioCtx.state === 'suspended') audioCtx.resume();
-            
-            const fx = effects[name];
-            fx.active = !fx.active;
-            document.getElementById(`${name}-led`).classList.toggle('active', fx.active);
-            
-            if(fx.active) {
-                fx.wetGain.gain.setTargetAtTime(1, audioCtx.currentTime, 0.01);
-                fx.dryGain.gain.setTargetAtTime(name==='delay' ? 1 : 0, audioCtx.currentTime, 0.01);
-            } else {
-                fx.wetGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.01);
-                fx.dryGain.gain.setTargetAtTime(1, audioCtx.currentTime, 0.01);
+        const title = document.createElement('div');
+        title.className = 'pedal-title';
+        title.textContent = type.toUpperCase();
+        el.appendChild(title);
+
+        const knobsContainer = document.createElement('div');
+        knobsContainer.className = 'knobs-container';
+        el.appendChild(knobsContainer);
+
+        // --- オーディオノード共通設定 ---
+        const inNode = audioCtx.createGain();
+        const outNode = audioCtx.createGain();
+        const wetGain = audioCtx.createGain();
+        const dryGain = audioCtx.createGain();
+        
+        inNode.connect(dryGain);
+        dryGain.connect(outNode);
+        wetGain.connect(outNode);
+        
+        wetGain.gain.value = 0; // Default OFF
+        dryGain.gain.value = 1;
+
+        let active = false;
+        let updateParams = () => {};
+
+        // パラメータ追加ヘルパー
+        function addKnob(label, min, max, step, val, onChange) {
+            const group = document.createElement('div');
+            group.className = 'knob-group';
+            // 表示調整
+            if(label === 'VOLUME' || label === 'MIX' || label === 'E.LEVEL' || label === 'DEPTH') {
+                group.style.width = '100%'; 
             }
+            const lbl = document.createElement('span');
+            lbl.className = 'knob-label';
+            lbl.textContent = label;
+            lbl.title = label; // ホバー時に全文表示
+            
+            const range = document.createElement('input');
+            range.type = 'range';
+            range.min = min; range.max = max; range.step = step; range.value = val;
+            range.addEventListener('input', () => onChange(parseFloat(range.value)));
+            
+            group.appendChild(lbl);
+            group.appendChild(range);
+            knobsContainer.appendChild(group);
+        }
+
+        // --- ペダルごとの固有機能 ---
+        if (type === 'od' || type === 'dist') {
+            const ws = audioCtx.createWaveShaper();
+            const filter = audioCtx.createBiquadFilter();
+            filter.type = 'lowpass';
+            const level = audioCtx.createGain();
+            
+            inNode.connect(ws);
+            ws.connect(filter);
+            filter.connect(level);
+            level.connect(wetGain);
+
+            let currentDrive = type==='od'? 10 : 50;
+            let currentTone = type==='od'? 2000 : 1500;
+            let currentLevel = 1.0;
+            const cType = type === 'od' ? 'soft' : 'hard';
+
+            updateParams = () => {
+                ws.curve = makeDistortionCurve(currentDrive, cType);
+                filter.frequency.value = currentTone;
+                level.gain.value = currentLevel;
+            };
+
+            addKnob(type==='od'?'DRIVE':'DIST', 1, 100, 1, currentDrive, v => { currentDrive = v; updateParams(); });
+            addKnob('TONE', 200, 5000, 10, currentTone, v => { currentTone = v; updateParams(); });
+            addKnob('LEVEL', 0, 2, 0.1, currentLevel, v => { currentLevel = v; updateParams(); });
+
+        } else if (type === 'fuzz') {
+            const ws = audioCtx.createWaveShaper();
+            const level = audioCtx.createGain();
+            
+            inNode.connect(ws);
+            ws.connect(level);
+            level.connect(wetGain);
+
+            let currentDrive = 80;
+            let currentLevel = 1.0;
+
+            updateParams = () => {
+                ws.curve = makeDistortionCurve(currentDrive / 10, 'asym');
+                level.gain.value = currentLevel;
+            };
+
+            addKnob('FUZZ', 10, 150, 1, currentDrive, v => { currentDrive = v; updateParams(); });
+            addKnob('VOLUME', 0, 2, 0.1, currentLevel, v => { currentLevel = v; updateParams(); });
+
+        } else if (type === 'delay') {
+            const delayNode = audioCtx.createDelay(2.0);
+            const feedbackGain = audioCtx.createGain();
+            const levelGain = audioCtx.createGain();
+
+            inNode.connect(delayNode);
+            delayNode.connect(feedbackGain);
+            feedbackGain.connect(delayNode);
+            
+            delayNode.connect(levelGain);
+            levelGain.connect(wetGain);
+            inNode.connect(wetGain); // 原音ミックス
+
+            addKnob('TIME', 0.05, 1.0, 0.01, 0.3, v => delayNode.delayTime.value = v);
+            addKnob('F.BACK', 0, 0.9, 0.05, 0.4, v => feedbackGain.gain.value = v);
+            addKnob('E.LEVEL', 0, 1, 0.05, 0.5, v => levelGain.gain.value = v);
+
+        } else if (type === 'chorus') {
+            const delayNode = audioCtx.createDelay(1.0);
+            delayNode.delayTime.value = 0.03; // Base delay
+            const osc = audioCtx.createOscillator();
+            osc.type = 'sine';
+            const depthGain = audioCtx.createGain();
+            
+            osc.connect(depthGain);
+            depthGain.connect(delayNode.delayTime);
+            osc.start();
+
+            inNode.connect(delayNode);
+            delayNode.connect(wetGain);
+            inNode.connect(wetGain); // Mix
+
+            addKnob('RATE', 0.1, 10, 0.1, 1.5, v => osc.frequency.value = v);
+            addKnob('DEPTH', 0, 0.05, 0.001, 0.002, v => depthGain.gain.value = v);
+
+        } else if (type === 'tremolo') {
+            const tremoloGain = audioCtx.createGain();
+            tremoloGain.gain.value = 0; // Base value modulated by LFO
+            const osc = audioCtx.createOscillator();
+            osc.type = 'sine';
+            const depthGain = audioCtx.createGain();
+            
+            osc.connect(depthGain);
+            depthGain.connect(tremoloGain.gain);
+            osc.start();
+
+            inNode.connect(tremoloGain);
+            tremoloGain.connect(wetGain);
+
+            let tDepth = 0.5;
+            updateParams = () => {
+                tremoloGain.gain.value = 1.0 - (tDepth / 2);
+                depthGain.gain.value = tDepth / 2;
+            };
+
+            addKnob('RATE', 0.5, 15, 0.1, 5.0, v => osc.frequency.value = v);
+            addKnob('DEPTH', 0, 1, 0.05, 0.5, v => { tDepth = v; updateParams(); });
+
+        } else if (type === 'reverb') {
+            const convolver = audioCtx.createConvolver();
+            convolver.buffer = createReverbImpulse();
+            const mixGain = audioCtx.createGain();
+
+            inNode.connect(convolver);
+            convolver.connect(mixGain);
+            mixGain.connect(wetGain);
+            inNode.connect(wetGain); // 原音
+
+            addKnob('MIX', 0, 1, 0.05, 0.5, v => mixGain.gain.value = v);
+        }
+
+        updateParams();
+
+        // --- フットスイッチ生成 ---
+        const switchContainer = document.createElement('div');
+        switchContainer.className = 'footswitch-container';
+        
+        const led = document.createElement('div');
+        led.className = 'led';
+        
+        const footswitch = document.createElement('button');
+        footswitch.className = 'footswitch';
+        
+        footswitch.addEventListener('click', () => {
+            active = !active;
+            led.classList.toggle('active', active);
+            if(active) {
+                wetGain.gain.setTargetAtTime(1, audioCtx.currentTime, 0.01);
+                // 空間系はドライ音を残す
+                dryGain.gain.setTargetAtTime(['delay','chorus','reverb'].includes(type) ? 1 : 0, audioCtx.currentTime, 0.01);
+            } else {
+                wetGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.01);
+                dryGain.gain.setTargetAtTime(1, audioCtx.currentTime, 0.01);
+            }
+        });
+
+        switchContainer.appendChild(led);
+        switchContainer.appendChild(footswitch);
+        el.appendChild(switchContainer);
+
+        // --- D&D イベント設定 ---
+        el.addEventListener('dragstart', (e) => {
+            e.dataTransfer.setData('text/plain', id);
+            e.dataTransfer.effectAllowed = 'move';
+        });
+
+        return { id, el, inNode, outNode };
+    }
+
+    // --- チェイン再構築 ---
+    function rebuildAudioChain() {
+        if (!audioCtx) return;
+
+        // 全て切断
+        masterInputNode.disconnect();
+        masterInputNode.connect(analyser); // Analyserは維持
+        activePedals.forEach(p => p.outNode.disconnect());
+
+        const boardElements = Array.from(document.getElementById('board').children);
+        
+        // 存在するペダルのみにフィルタし、DOM順に並び替え
+        const currentChain = boardElements
+            .map(el => activePedals.find(p => p.id === el.id))
+            .filter(p => p !== undefined);
+
+        // 順に接続
+        let prevNode = masterInputNode;
+        currentChain.forEach(pedal => {
+            prevNode.connect(pedal.inNode);
+            prevNode = pedal.outNode;
+        });
+
+        prevNode.connect(masterOutputNode);
+        
+        // 内部配列も同期
+        activePedals = currentChain;
+    }
+
+    // --- Drag and Drop Logic ---
+    const board = document.getElementById('board');
+    const trashBin = document.getElementById('trash-bin');
+    const paletteItems = document.querySelectorAll('.palette-item');
+
+    paletteItems.forEach(item => {
+        item.addEventListener('dragstart', (e) => {
+            e.dataTransfer.setData('source', 'palette');
+            e.dataTransfer.setData('type', item.dataset.type);
+            e.dataTransfer.effectAllowed = 'copy';
         });
     });
 
-    // パラメータ変更のリスナー
-    document.getElementById('od-drive').addEventListener('input', updateODCurve);
-    document.getElementById('od-tone').addEventListener('input', updateODCurve);
-    document.getElementById('od-level').addEventListener('input', updateODCurve);
-    
-    document.getElementById('dist-dist').addEventListener('input', updateDistCurve);
-    document.getElementById('dist-tone').addEventListener('input', updateDistCurve);
-    document.getElementById('dist-level').addEventListener('input', updateDistCurve);
+    board.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        board.classList.add('drag-over');
+    });
+    board.addEventListener('dragleave', () => board.classList.remove('drag-over'));
 
-    document.getElementById('fuzz-fuzz').addEventListener('input', updateFuzzCurve);
-    document.getElementById('fuzz-level').addEventListener('input', updateFuzzCurve);
+    board.addEventListener('drop', async (e) => {
+        e.preventDefault();
+        board.classList.remove('drag-over');
+        
+        await initAudioContext(); // ユーザー操作でContext初期化
 
-    document.getElementById('delay-time').addEventListener('input', updateDelayParams);
-    document.getElementById('delay-feedback').addEventListener('input', updateDelayParams);
-    document.getElementById('delay-level').addEventListener('input', updateDelayParams);
+        const source = e.dataTransfer.getData('source');
+        
+        if (source === 'palette') {
+            // パレットからの新規追加
+            const type = e.dataTransfer.getData('type');
+            const pedal = createPedalInstance(type);
+            activePedals.push(pedal);
+            board.appendChild(pedal.el);
+        } else {
+            // ボード内での並び替え
+            const id = e.dataTransfer.getData('text/plain');
+            const draggedElement = document.getElementById(id);
+            if (draggedElement && draggedElement.parentNode === board) {
+                // ドロップ位置の計算 (簡易的)
+                const afterElement = getDragAfterElement(board, e.clientX);
+                if (afterElement == null) {
+                    board.appendChild(draggedElement);
+                } else {
+                    board.insertBefore(draggedElement, afterElement);
+                }
+            }
+        }
+        rebuildAudioChain();
+    });
 
+    // 並べ替え位置計算ヘルパー
+    function getDragAfterElement(container, x) {
+        const draggableElements = [...container.querySelectorAll('.pedal:not(.dragging)')];
+        return draggableElements.reduce((closest, child) => {
+            const box = child.getBoundingClientRect();
+            const offset = x - box.left - box.width / 2;
+            if (offset < 0 && offset > closest.offset) {
+                return { offset: offset, element: child };
+            } else {
+                return closest;
+            }
+        }, { offset: Number.NEGATIVE_INFINITY }).element;
+    }
 
-    // --- 内蔵ギター音源 (Karplus-Strong) ---
+    // ゴミ箱の処理
+    trashBin.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        trashBin.classList.add('drag-over');
+    });
+    trashBin.addEventListener('dragleave', () => trashBin.classList.remove('drag-over'));
+    trashBin.addEventListener('drop', (e) => {
+        e.preventDefault();
+        trashBin.classList.remove('drag-over');
+        const id = e.dataTransfer.getData('text/plain');
+        const source = e.dataTransfer.getData('source');
+        if (source !== 'palette' && id) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.remove();
+                rebuildAudioChain();
+            }
+        }
+    });
+
+    // --- 内蔵ギター音源 (安定版・修正済) ---
     function generateGuitarBuffer() {
         const sr = audioCtx.sampleRate;
-        // ペンタトニックスケールのノート(Hz)
         const notes = [164.81, 196.00, 220.00, 246.94, 293.66, 329.63];
-        const durationPerNote = 0.4;
-        const totalDuration = notes.length * durationPerNote + 0.5;
+        const durationPerNote = 0.5;
+        const totalDuration = notes.length * durationPerNote;
         
-        presetBuffer = audioCtx.createBuffer(1, sr * totalDuration, sr);
-        const data = presetBuffer.getChannelData(0);
+        const buffer = audioCtx.createBuffer(1, sr * totalDuration, sr);
+        const data = buffer.getChannelData(0);
         
         let offset = 0;
         notes.forEach(freq => {
@@ -575,26 +887,27 @@
             }
             offset += samples;
         });
+        return buffer;
     }
 
     const playBtn = document.getElementById('play-preset-btn');
     playBtn.addEventListener('click', async () => {
         await initAudioContext();
-        if(audioCtx.state === 'suspended') audioCtx.resume();
 
         if (isPlayingPreset) {
-            presetSource.stop();
+            if(presetSource) presetSource.stop();
             isPlayingPreset = false;
-            playBtn.textContent = 'Play Default Guitar Preset';
+            playBtn.textContent = '🎸 Play Guitar Preset';
             playBtn.classList.remove('playing');
         } else {
+            const buffer = generateGuitarBuffer();
             presetSource = audioCtx.createBufferSource();
-            presetSource.buffer = presetBuffer;
+            presetSource.buffer = buffer;
             presetSource.loop = true;
-            presetSource.connect(effects.chainInput);
+            presetSource.connect(masterInputNode); // マスターインプットへ接続
             presetSource.start();
             isPlayingPreset = true;
-            playBtn.textContent = 'Stop Playback';
+            playBtn.textContent = '⏹️ Stop Playback';
             playBtn.classList.add('playing');
         }
     });
@@ -602,14 +915,11 @@
     // --- デバイスの列挙と選択 ---
     async function enumerateDevices() {
         try {
-            // 権限要求（列挙のために必要）
             await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-            
             const devices = await navigator.mediaDevices.enumerateDevices();
             const inputSelect = document.getElementById('audio-input');
             const outputSelect = document.getElementById('audio-output');
             
-            // Options clear
             inputSelect.innerHTML = '<option value="none">-- Select Input --</option>';
             outputSelect.innerHTML = '<option value="default">Default Output</option>';
 
@@ -633,13 +943,8 @@
         await initAudioContext();
         const deviceId = e.target.value;
         
-        // 既存の入力を停止
-        if(inputStream) {
-            inputStream.getTracks().forEach(track => track.stop());
-        }
-        if(inputSource) {
-            inputSource.disconnect();
-        }
+        if(inputStream) inputStream.getTracks().forEach(track => track.stop());
+        if(inputSource) inputSource.disconnect();
 
         if (deviceId !== 'none') {
             try {
@@ -647,7 +952,7 @@
                     audio: { deviceId: { exact: deviceId }, echoCancellation: false, noiseSuppression: false, autoGainControl: false }
                 });
                 inputSource = audioCtx.createMediaStreamSource(inputStream);
-                inputSource.connect(effects.chainInput);
+                inputSource.connect(masterInputNode);
             } catch (err) {
                 console.error("Input device error", err);
             }
@@ -657,25 +962,18 @@
     document.getElementById('audio-output').addEventListener('change', async (e) => {
         const deviceId = e.target.value;
         const audioElement = document.getElementById('audio-out-element');
-        
         if (typeof audioElement.setSinkId !== 'undefined') {
             try {
                 await audioElement.setSinkId(deviceId === 'default' ? '' : deviceId);
-                console.log(`Audio output directed to ${deviceId}`);
             } catch (error) {
                 console.error("Error setting output device:", error);
-                alert("This browser does not support output device routing or permission is denied.");
             }
-        } else {
-            alert("Your browser does not support setSinkId for output routing.");
         }
     });
 
-    // 初期化（ページロード後）
     window.addEventListener('load', () => {
         enumerateDevices();
     });
-
 </script>
 </body>
 </html>
