@@ -14,7 +14,11 @@
     }
     body {
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        background-color: #121212;
+        background-color: #1a1a1a;
+        background-image: linear-gradient(45deg, #161616 25%, transparent 25%, transparent 75%, #161616 75%, #161616),
+                          linear-gradient(45deg, #161616 25%, transparent 25%, transparent 75%, #161616 75%, #161616);
+        background-size: 20px 20px;
+        background-position: 0 0, 10px 10px;
         color: #e0e0e0;
         margin: 0;
         padding: 20px;
@@ -23,31 +27,37 @@
         align-items: center;
     }
     h1 {
-        font-size: 24px;
-        font-weight: 600;
-        letter-spacing: 1px;
+        font-size: 28px;
+        font-weight: 700;
+        letter-spacing: 2px;
         margin-bottom: 24px;
         text-align: center;
-        color: #ffffff;
+        color: #fff;
+        text-transform: uppercase;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.8);
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
         max-width: 100%;
     }
 
-    /* コントロールパネル */
+    /* コントロールパネル（ラック機材風） */
     .header-panel {
-        background: #1e1e1e;
+        background: linear-gradient(to bottom, #2b2b2b, #1a1a1a);
         padding: 24px;
-        border-radius: 8px;
-        border: 1px solid #333;
+        border-radius: 4px;
+        border: 2px solid #000;
+        border-top: 2px solid #444;
         width: 100%;
         max-width: 1100px;
         margin-bottom: 24px;
         display: flex;
         flex-wrap: wrap;
         gap: 24px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        box-shadow: 
+            0 10px 30px rgba(0, 0, 0, 0.8),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        position: relative;
     }
     
     .io-section {
@@ -65,39 +75,42 @@
         max-width: 100%;
     }
     .device-select label {
-        font-size: 12px;
-        font-weight: 600;
-        color: #aaa;
+        font-size: 11px;
+        font-weight: 700;
+        color: #999;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
+        letter-spacing: 1px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
     }
     select, button {
         padding: 12px 16px;
-        background: #2a2a2a;
+        background: linear-gradient(to bottom, #333, #222);
         color: #e0e0e0;
-        border: 1px solid #444;
-        border-radius: 6px;
+        border: 1px solid #111;
+        border-top: 1px solid #555;
+        border-radius: 4px;
         font-size: 13px;
-        font-weight: 500;
+        font-weight: 600;
         cursor: pointer;
         max-width: 100%;
-        transition: all 0.2s ease;
+        transition: all 0.1s ease;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
         font-family: inherit;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.5);
     }
     select:focus, button:focus {
         outline: none;
-        border-color: #007acc;
-        box-shadow: 0 0 0 2px rgba(0, 122, 204, 0.3);
+        border-color: #00ffcc;
+        box-shadow: 0 0 0 2px rgba(0, 255, 204, 0.2);
     }
-    button:hover {
-        background: #333;
-        border-color: #555;
+    select:active, button:active {
+        background: #1c1c1c;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.8);
+        border-top: 1px solid #111;
     }
     
     .btn-group {
@@ -115,31 +128,25 @@
 
     button.play-btn {
         flex-grow: 1;
-        background: #007acc;
+        background: linear-gradient(to bottom, #007acc, #005086);
         color: #fff;
-        border: none;
+        border-top-color: #33aaff;
         height: 40px;
         min-width: 120px;
     }
-    button.play-btn:hover {
-        background: #008be6;
-    }
     button.play-btn.playing {
-        background: #d32f2f;
+        background: linear-gradient(to bottom, #d32f2f, #9a0007);
+        border-top-color: #ff6659;
     }
     
     button.toggle-btn {
-        background: #444;
+        background: linear-gradient(to bottom, #444, #2a2a2a);
         color: #fff;
-        border: none;
         height: 40px;
         flex-grow: 1;
     }
-    button.toggle-btn:hover {
-        background: #555;
-    }
 
-    /* 波形プレビュー＆チューナー */
+    /* 波形プレビュー＆チューナー（液晶ディスプレイ風） */
     .preview-section {
         flex: 1;
         display: flex;
@@ -147,6 +154,11 @@
         min-width: 300px;
         max-width: 100%;
         height: 190px;
+        background: #051210;
+        padding: 12px;
+        border-radius: 4px;
+        border: 2px solid #000;
+        box-shadow: inset 0 2px 8px rgba(0,0,0,0.8), 0 1px 0 rgba(255,255,255,0.1);
         overflow: hidden;
     }
     .preview-header {
@@ -157,32 +169,31 @@
         width: 100%;
     }
     .preview-label {
-        font-size: 12px;
-        font-weight: 600;
-        color: #aaa;
+        font-size: 11px;
+        font-weight: 700;
+        color: #00ffcc;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
+        letter-spacing: 1px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        text-shadow: 0 0 4px rgba(0, 255, 204, 0.4);
     }
     .tuner-display {
         font-size: 13px;
         font-weight: bold;
-        color: #888;
-        background: #0a0a0a;
-        padding: 4px 10px;
-        border-radius: 4px;
-        border: 1px solid #333;
+        color: #00ffcc;
+        background: transparent;
+        padding: 0;
         white-space: nowrap;
+        text-shadow: 0 0 4px rgba(0, 255, 204, 0.4);
     }
     canvas {
-        background: #0a0a0a;
-        border: 1px solid #333;
-        border-radius: 6px;
+        background: transparent;
         width: 100%;
         flex: 1;
         min-height: 0;
+        border: none;
     }
 
     /* ワークスペース全体 */
@@ -199,49 +210,50 @@
         flex: 1;
         min-width: 220px;
         max-width: 280px;
-        background: #1e1e1e;
-        border: 1px solid #333;
-        border-radius: 8px;
+        background: linear-gradient(to bottom, #2b2b2b, #1a1a1a);
+        border: 2px solid #000;
+        border-top: 2px solid #444;
+        border-radius: 4px;
         padding: 16px;
         display: flex;
         flex-direction: column;
         gap: 12px;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.8);
     }
     .palette-title {
-        font-size: 12px;
-        font-weight: 600;
+        font-size: 11px;
+        font-weight: 700;
         color: #aaa;
         text-transform: uppercase;
         margin-bottom: 8px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        letter-spacing: 1px;
     }
     .palette-item {
-        background: #2a2a2a;
-        border: 1px solid #444;
+        background: linear-gradient(to bottom, #333, #222);
+        border: 1px solid #111;
+        border-top: 1px solid #555;
         border-left: 4px solid #555;
-        border-radius: 4px;
+        border-radius: 3px;
         padding: 12px;
-        font-weight: 500;
-        font-size: 13px;
+        font-weight: 600;
+        font-size: 12px;
         cursor: grab;
-        color: #ccc;
+        color: #ddd;
         transition: all 0.1s;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.5);
     }
     .palette-item:active {
         cursor: grabbing;
-    }
-    .palette-item:hover {
-        background: #333;
-        border-left-color: #007acc;
-        color: #fff;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.8);
     }
 
-    /* エフェクターボード */
+    /* ペダルボード（ベルクロ/カーペット風） */
     .board-container {
         flex: 3;
         min-width: 320px;
@@ -251,14 +263,22 @@
         max-width: 100%;
     }
     .board {
-        background: #181818;
-        border: 1px solid #222;
-        border-radius: 8px;
-        min-height: 400px;
+        /* ベルクロ風テクスチャ */
+        background-color: #111;
+        background-image: 
+            radial-gradient(#222 1px, transparent 1px),
+            radial-gradient(#222 1px, transparent 1px);
+        background-size: 4px 4px;
+        background-position: 0 0, 2px 2px;
+        border: 4px solid #2a2a2a;
+        border-radius: 6px;
+        min-height: 420px;
         padding: 24px;
         display: flex;
-        gap: 16px;
-        box-shadow: inset 0 4px 20px rgba(0, 0, 0, 0.6);
+        gap: 20px;
+        box-shadow: 
+            inset 0 15px 30px rgba(0, 0, 0, 0.9), 
+            0 10px 20px rgba(0,0,0,0.6);
         align-items: center;
         position: relative;
         align-content: flex-start;
@@ -273,123 +293,134 @@
         overflow-y: auto;
     }
 
-    .board::-webkit-scrollbar {
-        height: 14px;
-        width: 14px;
-    }
-    .board::-webkit-scrollbar-track {
-        background: #111;
-        border-radius: 8px;
-        border: 1px solid #222;
-    }
-    .board::-webkit-scrollbar-thumb {
-        background: #444;
-        border-radius: 7px;
-        border: 3px solid #111;
-    }
-    .board::-webkit-scrollbar-thumb:hover {
-        background: #666;
-    }
+    .board::-webkit-scrollbar { height: 14px; width: 14px; }
+    .board::-webkit-scrollbar-track { background: #111; border: 1px solid #222; }
+    .board::-webkit-scrollbar-thumb { background: #444; border-radius: 7px; border: 3px solid #111; }
+    .board::-webkit-scrollbar-thumb:hover { background: #666; }
 
     .board::before {
         content: "Drag pedals here";
         position: absolute;
-        top: 50%;
-        left: 50%;
+        top: 50%; left: 50%;
         transform: translate(-50%, -50%);
-        color: #333;
-        font-weight: 600;
-        font-size: 18px;
+        color: #444;
+        font-weight: 700;
+        font-size: 20px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
         pointer-events: none;
     }
-    .board > * {
-        z-index: 1;
-    }
+    .board > * { z-index: 1; }
     .board.drag-over {
-        background: #1c232a;
-        border: 1px dashed #007acc;
+        background-color: #1a2228;
+        border-color: #007acc;
     }
 
     /* ゴミ箱 */
     .trash-bin {
-        background: #1e1e1e;
-        border: 1px dashed #555;
-        border-radius: 6px;
+        background: repeating-linear-gradient(
+            -45deg,
+            #1e1e1e,
+            #1e1e1e 10px,
+            #252525 10px,
+            #252525 20px
+        );
+        border: 2px dashed #555;
+        border-radius: 4px;
         padding: 16px;
         text-align: center;
-        font-weight: 500;
+        font-weight: 700;
         font-size: 13px;
         color: #888;
+        text-transform: uppercase;
+        letter-spacing: 1px;
         transition: all 0.2s;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
     }
     .trash-bin.drag-over {
-        background: #4a1919;
+        background: #3d1414;
         border-color: #ff5252;
         color: #ff5252;
     }
 
-    /* ペダルデザイン */
+    /* ペダルデザイン（リアルな筐体風） */
     .pedal {
-        min-width: 160px;
-        width: 160px;
-        height: 290px;
-        background: #252525;
-        border-radius: 6px;
+        min-width: 170px;
+        width: 170px;
+        height: 310px;
+        background: linear-gradient(135deg, #3a3a3a, #202020);
+        border-radius: 8px;
         display: flex;
         flex-direction: column;
         align-items: center;
         padding: 16px 12px;
-        box-shadow: 4px 8px 16px rgba(0,0,0,0.6), inset 0 1px 1px rgba(255,255,255,0.05);
+        box-shadow: 
+            8px 12px 20px rgba(0,0,0,0.7), 
+            inset 1px 1px 2px rgba(255,255,255,0.1),
+            inset -2px -2px 4px rgba(0,0,0,0.6);
         position: relative;
         cursor: grab;
         flex-shrink: 0;
-        border: 1px solid #111;
-        border-top: 4px solid #555;
+        border: 1px solid #000;
     }
-    .pedal:active {
-        cursor: grabbing;
+    /* ペダルの上部カラー帯を擬似要素で表現 */
+    .pedal::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 8px;
+        border-top-left-radius: 7px;
+        border-top-right-radius: 7px;
+        background: #555;
+        box-shadow: inset 0 2px 2px rgba(255,255,255,0.2);
     }
-    .pedal.dragging {
-        opacity: 0.4;
-    }
+    .pedal:active { cursor: grabbing; }
+    .pedal.dragging { opacity: 0.5; }
+    
     .pedal-title {
-        font-weight: 700;
-        font-size: 11px;
-        letter-spacing: 1px;
-        margin-bottom: 16px;
-        color: #ccc;
+        font-weight: 800;
+        font-size: 12px;
+        letter-spacing: 1.5px;
+        margin-bottom: 20px;
+        margin-top: 4px;
+        color: #fff;
         text-align: center;
         width: 100%;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
         text-transform: uppercase;
-        background: rgba(0,0,0,0.2);
-        padding: 4px;
-        border-radius: 3px;
+        background: rgba(0,0,0,0.3);
+        padding: 6px 4px;
+        border-radius: 4px;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        text-shadow: 0 1px 2px #000;
     }
 
-    .pedal.comp { border-top-color: #ffd600; }
-    .pedal.od { border-top-color: #ffb300; }
-    .pedal.dist { border-top-color: #e53935; }
-    .pedal.metal { border-top-color: #424242; background: #1a1a1a; }
-    .pedal.fuzz { border-top-color: #8e24aa; }
-    .pedal.phaser { border-top-color: #ab47bc; }
-    .pedal.flanger { border-top-color: #fdd835; }
-    .pedal.autowah { border-top-color: #8bc34a; }
-    .pedal.delay { border-top-color: #039be5; }
-    .pedal.chorus { border-top-color: #00897b; }
-    .pedal.tremolo { border-top-color: #fb8c00; }
-    .pedal.reverb { border-top-color: #d81b60; }
+    /* 各ペダルのカラーリング */
+    .pedal.comp::before { background: #ffd600; }
+    .pedal.od::before { background: #ffb300; }
+    .pedal.dist::before { background: #e53935; }
+    .pedal.metal { background: linear-gradient(135deg, #1a1a1a, #050505); }
+    .pedal.metal::before { background: #424242; }
+    .pedal.fuzz::before { background: #8e24aa; }
+    .pedal.phaser::before { background: #ab47bc; }
+    .pedal.flanger::before { background: #fdd835; }
+    .pedal.autowah::before { background: #8bc34a; }
+    .pedal.delay::before { background: #039be5; }
+    .pedal.chorus::before { background: #00897b; }
+    .pedal.tremolo::before { background: #fb8c00; }
+    .pedal.reverb::before { background: #d81b60; }
+    .pedal.noisegate::before { background: #e0e0e0; }
 
     /* ノブセクション */
     .knobs-container {
         display: flex;
         flex-direction: column;
-        gap: 10px;
+        gap: 12px;
         width: 100%;
         flex-grow: 1;
         overflow: hidden;
@@ -400,87 +431,125 @@
         width: 100%;
     }
     .knob-label {
-        font-size: 10px;
-        color: #aaa;
-        font-weight: 600;
+        font-size: 9px;
+        color: #bbb;
+        font-weight: 700;
         margin-bottom: 4px;
         display: flex;
         justify-content: space-between;
         gap: 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
     .knob-label span {
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        min-width: 0;
     }
     
+    /* リアルなフェーダー風スライダー */
     input[type=range] {
         -webkit-appearance: none;
         width: 100%;
         background: transparent;
-        margin: 0;
+        margin: 6px 0;
     }
     input[type=range]:focus { outline: none; }
     input[type=range]::-webkit-slider-runnable-track {
-        width: 100%; height: 4px; cursor: pointer; background: #111; border-radius: 2px; border: 1px solid #333;
+        width: 100%; 
+        height: 6px; 
+        cursor: pointer; 
+        background: #000; 
+        border-radius: 3px; 
+        border: 1px solid #333;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.9);
     }
     input[type=range]::-webkit-slider-thumb {
-        height: 14px; width: 10px; border-radius: 2px; background: #999; cursor: pointer; -webkit-appearance: none; margin-top: -6px; box-shadow: 0 1px 3px rgba(0,0,0,0.8); transition: background 0.1s;
+        height: 20px; 
+        width: 14px; 
+        border-radius: 3px; 
+        background: linear-gradient(to bottom, #dcdcdc, #999); 
+        cursor: pointer; 
+        -webkit-appearance: none; 
+        margin-top: -8px; 
+        box-shadow: 0 3px 5px rgba(0,0,0,0.8), inset 0 1px 1px rgba(255,255,255,0.5); 
+        border: 1px solid #111;
     }
-    input[type=range]:hover::-webkit-slider-thumb { background: #ccc; }
+    input[type=range]:hover::-webkit-slider-thumb { 
+        background: linear-gradient(to bottom, #eee, #aaa); 
+    }
 
-    /* フットスイッチ */
+    /* フットスイッチ（リアルな金属スイッチ風） */
     .footswitch-container {
         margin-top: auto;
         display: flex;
         flex-direction: column;
         align-items: center;
         width: 100%;
-        padding-top: 8px;
+        padding-top: 12px;
     }
     .led {
-        width: 8px;
-        height: 8px;
+        width: 10px;
+        height: 10px;
         border-radius: 50%;
-        background-color: #111;
+        background-color: #222;
         border: 1px solid #000;
-        margin-bottom: 10px;
-        box-shadow: inset 0px 1px 2px rgba(0,0,0,0.8);
+        margin-bottom: 12px;
+        box-shadow: inset 0px 2px 4px rgba(0,0,0,0.8);
         transition: all 0.1s;
     }
     .led.active {
         background-color: #ff3b30;
-        border-color: #ff5252;
-        box-shadow: 0 0 6px #ff3b30, inset 0px 1px 2px rgba(255,255,255,0.4);
+        border-color: #ff8a80;
+        box-shadow: 0 0 8px #ff3b30, 0 0 15px #ff3b30, inset 0px 1px 3px rgba(255,255,255,0.6);
     }
     .footswitch {
-        width: 36px;
-        height: 36px;
+        width: 44px;
+        height: 44px;
         border-radius: 50%;
-        background: linear-gradient(135deg, #444, #222);
-        border: 2px solid #111;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.6), inset 0 2px 2px rgba(255,255,255,0.1);
+        background: radial-gradient(circle, #f0f0f0 0%, #a0a0a0 40%, #555 100%);
+        border: 2px solid #222;
+        box-shadow: 
+            0 5px 8px rgba(0,0,0,0.8), 
+            inset 0 1px 3px rgba(255,255,255,0.9);
         cursor: pointer;
         outline: none;
         transition: transform 0.05s, box-shadow 0.05s;
+        position: relative;
+    }
+    /* スイッチ中央の突起部 */
+    .footswitch::after {
+        content: '';
+        position: absolute;
+        top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+        width: 22px; height: 22px;
+        border-radius: 50%;
+        background: radial-gradient(circle, #ddd 0%, #888 100%);
+        box-shadow: inset 0 -1px 3px rgba(0,0,0,0.6);
     }
     .footswitch:active {
-        box-shadow: 0 1px 2px rgba(0,0,0,0.8), inset 0 1px 2px rgba(255,255,255,0.1);
-        transform: translateY(2px);
+        box-shadow: 0 1px 3px rgba(0,0,0,0.9), inset 0 2px 6px rgba(0,0,0,0.9);
+        transform: translateY(3px);
+    }
+    .footswitch:active::after {
+        background: radial-gradient(circle, #bbb 0%, #666 100%);
     }
     
     .vol-slider-wrap {
         display: flex;
         align-items: center;
-        background: #2a2a2a;
+        background: rgba(0,0,0,0.3);
         padding: 0 12px;
-        border-radius: 6px;
-        border: 1px solid #444;
+        border-radius: 4px;
+        border: 1px solid #111;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
         height: 40px;
     }
     .vol-slider-wrap label {
         font-size: 11px;
-        color: #aaa;
+        color: #ccc;
         margin-right: 8px;
         font-weight: bold;
     }
@@ -541,6 +610,7 @@
         <!-- エフェクター追加パレット -->
         <div class="palette" id="palette">
             <div class="palette-title">Module Library</div>
+            <div class="palette-item" draggable="true" data-type="noisegate">Noise Gate (NG-1)</div>
             <div class="palette-item" draggable="true" data-type="comp">Compressor (CS-1)</div>
             <div class="palette-item" draggable="true" data-type="autowah">Auto Wah (AW-1)</div>
             <div class="palette-item" draggable="true" data-type="od">Overdrive (OD-1)</div>
@@ -602,7 +672,6 @@
             analyserOutput.fftSize = 2048;
             masterOutputNode.connect(analyserOutput);
 
-            // <audio>タグへのバイパスを廃止し、AudioContextのDestinationに直結することで遅延を解消
             masterOutputNode.connect(audioCtx.destination);
             
             drawOscilloscope();
@@ -661,8 +730,7 @@
             
             if (freq === -1 || isNaN(freq) || freq > 4000) {
                 display.textContent = "Tuner: --";
-                display.style.color = "#888";
-                display.style.borderColor = "#333";
+                display.style.color = "#00ffcc";
             } else {
                 const notes = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
                 const A4 = 440;
@@ -676,11 +744,11 @@
                 display.textContent = `${notes[noteIndex]} (${Math.round(freq)}Hz)`;
                 
                 if (Math.abs(cents) < 10) {
-                    display.style.color = "#4caf50"; display.style.borderColor = "#4caf50";
+                    display.style.color = "#00ffcc"; 
                 } else if (Math.abs(cents) < 25) {
-                    display.style.color = "#ffb300"; display.style.borderColor = "#ffb300";
+                    display.style.color = "#ffeb3b"; 
                 } else {
-                    display.style.color = "#ff5252"; display.style.borderColor = "#ff5252";
+                    display.style.color = "#ff5252"; 
                 }
             }
         }
@@ -699,11 +767,12 @@
             if(canvas.height !== canvas.clientHeight) canvas.height = canvas.clientHeight;
 
             analyserOutput.getByteTimeDomainData(dataArray);
-            canvasCtx.fillStyle = '#0a0a0a'; 
-            canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+            canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
 
-            canvasCtx.lineWidth = 1.5;
-            canvasCtx.strokeStyle = '#007acc';
+            canvasCtx.lineWidth = 2;
+            canvasCtx.strokeStyle = '#00ffcc';
+            canvasCtx.shadowBlur = 4;
+            canvasCtx.shadowColor = '#00ffcc';
             canvasCtx.beginPath();
 
             const sliceWidth = canvas.width * 1.0 / bufferLength;
@@ -718,6 +787,7 @@
             }
             canvasCtx.lineTo(canvas.width, canvas.height / 2);
             canvasCtx.stroke();
+            canvasCtx.shadowBlur = 0;
         }
         draw();
     }
@@ -763,7 +833,7 @@
 
         const title = document.createElement('div');
         title.className = 'pedal-title';
-        title.textContent = type;
+        title.textContent = type === 'noisegate' ? 'Noise Gate' : type;
         el.appendChild(title);
 
         const knobsContainer = document.createElement('div');
@@ -804,7 +874,12 @@
             lblText.textContent = label;
             
             const valText = document.createElement('span');
-            const displayVal = (v) => step < 0.1 ? v.toFixed(2) : step < 1 ? v.toFixed(1) : Math.round(v);
+            const displayVal = (v) => {
+                if (Math.abs(step) < 0.01) return v.toFixed(3);
+                if (Math.abs(step) < 0.1) return v.toFixed(2);
+                if (Math.abs(step) < 1) return v.toFixed(1);
+                return Math.round(v);
+            };
             valText.textContent = displayVal(val);
             
             lblContainer.appendChild(lblText);
@@ -830,7 +905,29 @@
             onChange(val);
         }
 
-        if (type === 'comp') {
+        // ノイズゲート (Noise Gate) の追加実装
+        if (type === 'noisegate') {
+            const ws = audioCtx.createWaveShaper();
+            inNode.connect(ws); ws.connect(wetGain);
+
+            let threshold = 0.02;
+            updateParams = () => {
+                const n_samples = 44100;
+                const curve = new Float32Array(n_samples);
+                for (let i = 0; i < n_samples; ++i) {
+                    let x = i * 2 / n_samples - 1;
+                    if (Math.abs(x) < threshold) {
+                        curve[i] = 0;
+                    } else {
+                        // クリップノイズを防ぐため、スレッショルド以上は滑らかに繋ぐ
+                        curve[i] = Math.sign(x) * (Math.abs(x) - threshold) / (1 - threshold);
+                    }
+                }
+                ws.curve = curve;
+            };
+
+            addKnob('THRESH', 0.0, 0.2, 0.005, threshold, v => { threshold = v; updateParams(); });
+        } else if (type === 'comp') {
             const comp = audioCtx.createDynamicsCompressor();
             const level = audioCtx.createGain();
             inNode.connect(comp); comp.connect(level); level.connect(wetGain);
@@ -992,7 +1089,7 @@
 
         updateParams();
 
-        const isInsertEffect = ['comp', 'od', 'dist', 'metal', 'fuzz', 'tremolo', 'phaser', 'autowah'].includes(type);
+        const isInsertEffect = ['noisegate', 'comp', 'od', 'dist', 'metal', 'fuzz', 'tremolo', 'phaser', 'autowah'].includes(type);
 
         const switchContainer = document.createElement('div');
         switchContainer.className = 'footswitch-container';
@@ -1136,29 +1233,28 @@
         const sr = audioCtx.sampleRate;
         let melody = [];
 
-        // テンポと音階の設定
         const T_BPM120 = 60/120;
         const T_BPM160 = 60/160;
         
         const noteFreq = (noteNum) => 440 * Math.pow(2, (noteNum - 69) / 12);
 
         switch (presetType) {
-            case "1": // 8-Beat Rock (Power Chords E5)
+            case "1": 
                 for(let i=0; i<8; i++) melody.push({ freq: noteFreq(40), dur: T_BPM120/2 });
                 break;
-            case "2": // Heavy Gallop (E, E, E, C, D)
+            case "2": 
                 for(let i=0; i<4; i++) {
                     melody.push({ freq: noteFreq(40), dur: T_BPM160/2 });
                     melody.push({ freq: noteFreq(40), dur: T_BPM160/4 });
                     melody.push({ freq: noteFreq(40), dur: T_BPM160/4 });
                 }
                 break;
-            case "3": // Punk Chords (Fast 8ths A5, F5, C5, G5)
+            case "3": 
                 [45, 41, 48, 43].forEach(n => {
                     for(let i=0; i<8; i++) melody.push({ freq: noteFreq(n), dur: T_BPM160/2 });
                 });
                 break;
-            case "4": // Blues Shuffle
+            case "4": 
                 for(let i=0; i<4; i++) {
                     melody.push({ freq: noteFreq(40), dur: T_BPM120 * 0.66 });
                     melody.push({ freq: noteFreq(40), dur: T_BPM120 * 0.34 });
@@ -1166,10 +1262,10 @@
                     melody.push({ freq: noteFreq(40), dur: T_BPM120 * 0.34 });
                 }
                 break;
-            case "5": // Arpeggio Clean (Emadd9)
+            case "5": 
                 [40, 47, 52, 54, 59, 54, 52, 47].forEach(n => melody.push({ freq: noteFreq(n), dur: T_BPM120 }));
                 break;
-            case "6": // Metal Chug (Low Drop D syncopation)
+            case "6": 
                 const chug = [ 
                     {f: 38, d: T_BPM160/2}, {f: 38, d: T_BPM160/2}, {f: 41, d: T_BPM160/2}, 
                     {f: 38, d: T_BPM160/4}, {f: 38, d: T_BPM160/4}, {f: 38, d: T_BPM160/2}, 
@@ -1177,12 +1273,12 @@
                 ];
                 for(let i=0; i<2; i++) chug.forEach(c => melody.push({ freq: noteFreq(c.f), dur: c.d }));
                 break;
-            case "7": // Doom Slow (Low B)
+            case "7": 
                 melody.push({ freq: noteFreq(35), dur: T_BPM120 * 4 });
                 melody.push({ freq: noteFreq(38), dur: T_BPM120 * 2 });
                 melody.push({ freq: noteFreq(34), dur: T_BPM120 * 2 });
                 break;
-            case "8": // Speed Octaves
+            case "8": 
                 for(let i=0; i<16; i++) {
                     melody.push({ freq: noteFreq(52), dur: T_BPM160/4 });
                     melody.push({ freq: noteFreq(64), dur: T_BPM160/4 });
@@ -1191,7 +1287,6 @@
         }
 
         const totalDuration = melody.reduce((sum, note) => sum + note.dur, 0);
-        // 最終音が自然に減衰（リングアウト）するための余白時間を追加
         const ringOutTime = 1.5; 
         const bufferLength = sr * (totalDuration + ringOutTime);
         const buffer = audioCtx.createBuffer(1, bufferLength, sr);
@@ -1203,7 +1298,6 @@
             const period = Math.round(sr / note.freq);
             const delayLine = new Float32Array(period);
             
-            // ピッキングノイズの生成（エレキギター特有の鈍いアタック感をローパスで再現）
             let lastNoise = 0;
             for (let i = 0; i < period; i++) {
                 let noise = Math.random() * 2 - 1;
@@ -1214,7 +1308,7 @@
             
             const noteSamples = Math.floor(sr * note.dur);
             const ringOutSamples = Math.floor(sr * ringOutTime);
-            const decay = 0.996; // サスティンを長めに設定
+            const decay = 0.996; 
             
             for (let i = 0; i < noteSamples + ringOutSamples; i++) {
                 if (offset + i >= data.length) break;
@@ -1222,37 +1316,26 @@
                 const idx = i % period;
                 const nextIdx = (i + 1) % period;
                 
-                // Karplus-Strong フィルター処理
                 const filtered = 0.5 * (delayLine[idx] + delayLine[nextIdx]);
                 delayLine[idx] = filtered * decay;
                 
-                // クリックノイズ防止のためのエンベロープ
                 let env = 1.0;
                 if (i < 20) env = i / 20; 
                 if (i > (noteSamples + ringOutSamples) - 1000) {
                     env = Math.max(0, ((noteSamples + ringOutSamples) - i) / 1000);
                 }
                 
-                // 前の音の減衰を残しつつ（加算）、複数の弦が鳴る質感を出す
                 data[offset + i] += (delayLine[idx] * env * 0.7);
             }
-            // 次の音はデュレーション（noteSamples）後から発音開始
             offset += noteSamples;
         });
 
-        // マグネティック・ピックアップ及びDI（ダイレクト）特有の音色調整
-        // 計算式の修正：不安定なハイパスを取り除き、正確なDCブロッカー（高域はそのまま低域だけ切る）を適用
         let lp = 0, lastLp = 0, dc = 0;
         for (let i = 0; i < data.length; i++) {
             let sample = data[i];
             
-            // 微小なサチュレーション（ピックアップのコンプレッション感）
             sample = Math.tanh(sample * 1.5);
-            
-            // ローパスフィルター（高域のキンキンした音を削る。約4〜5kHzのロールオフ）
             lp = lp + 0.4 * (sample - lp);
-            
-            // 正確なDCブロッカー（不要な極低域のカットによる波形中心のズレ補正）
             dc = lp - lastLp + 0.995 * dc;
             lastLp = lp;
             
@@ -1281,11 +1364,9 @@
             presetPlayBtn.textContent = 'Loading...';
             presetPlayBtn.disabled = true;
             
-            // UIを更新させるために少し待つ
             setTimeout(() => {
                 const pType = document.getElementById('preset-selector').value;
                 
-                // バッファをキャッシュして2回目以降の再計算を防ぐ
                 if (!presetCache[pType]) {
                     presetCache[pType] = generateGuitarBuffer(pType);
                 }
