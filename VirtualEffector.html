@@ -179,21 +179,66 @@
         text-overflow: ellipsis;
         text-shadow: 0 0 4px rgba(0, 255, 204, 0.4);
     }
-    .tuner-display {
-        font-size: 13px;
-        font-weight: bold;
-        color: #00ffcc;
-        background: transparent;
-        padding: 0;
-        white-space: nowrap;
-        text-shadow: 0 0 4px rgba(0, 255, 204, 0.4);
-    }
     canvas {
         background: transparent;
         width: 100%;
         flex: 1;
         min-height: 0;
         border: none;
+    }
+
+    /* チューナー専用ビュー */
+    .tuner-view {
+        display: none;
+        flex: 1;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        min-height: 0;
+    }
+    .tuner-note {
+        font-size: 32px;
+        font-weight: bold;
+        color: #00ffcc;
+        text-shadow: 0 0 8px rgba(0, 255, 204, 0.4);
+        margin-bottom: 16px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+        text-align: center;
+    }
+    .tuner-meter {
+        width: 80%;
+        max-width: 200px;
+        height: 8px;
+        background: #111;
+        border: 1px solid #333;
+        border-radius: 4px;
+        position: relative;
+        box-shadow: inset 0 1px 3px rgba(0,0,0,0.8);
+    }
+    .tuner-meter-indicator {
+        position: absolute;
+        top: -4px;
+        width: 4px;
+        height: 14px;
+        background: #00ffcc;
+        left: 50%;
+        transform: translateX(-50%);
+        box-shadow: 0 0 6px #00ffcc;
+        transition: left 0.1s ease, background-color 0.1s ease, box-shadow 0.1s ease;
+        border-radius: 2px;
+    }
+    .tuner-meter-center {
+        position: absolute;
+        top: -4px;
+        bottom: -4px;
+        left: 50%;
+        width: 2px;
+        background: rgba(255,255,255,0.2);
+        transform: translateX(-50%);
     }
 
     /* ワークスペース全体 */
@@ -597,10 +642,17 @@
         
         <div class="preview-section">
             <div class="preview-header">
-                <div class="preview-label">Output Analyzer</div>
-                <div class="tuner-display" id="tuner-display">Tuner: --</div>
+                <div class="preview-label" id="preview-label">Output Analyzer</div>
+                <button id="switch-preview-btn" class="toggle-btn" style="height: 24px; padding: 0 12px; font-size: 11px; flex-grow: 0; min-width: auto; line-height: 1;">Tuner</button>
             </div>
             <canvas id="oscilloscope"></canvas>
+            <div class="tuner-view" id="tuner-view">
+                <div class="tuner-note" id="tuner-note">--</div>
+                <div class="tuner-meter">
+                    <div class="tuner-meter-center"></div>
+                    <div class="tuner-meter-indicator" id="tuner-meter-indicator"></div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -648,10 +700,34 @@
 
     let activePedals = [];
     let pedalCounter = 0;
+    
+    let currentPreviewMode = 'waveform'; // 'waveform' or 'tuner'
 
     // 音源バッファのキャッシュ用
     const presetCache = {};
     let pVolNode = null;
+
+    // 波形/チューナー表示切替イベントリスナー
+    document.getElementById('switch-preview-btn').addEventListener('click', (e) => {
+        const btn = e.target;
+        const osc = document.getElementById('oscilloscope');
+        const tunerView = document.getElementById('tuner-view');
+        const label = document.getElementById('preview-label');
+
+        if (currentPreviewMode === 'waveform') {
+            currentPreviewMode = 'tuner';
+            osc.style.display = 'none';
+            tunerView.style.display = 'flex';
+            label.textContent = 'Guitar Tuner';
+            btn.textContent = 'Analyzer';
+        } else {
+            currentPreviewMode = 'waveform';
+            osc.style.display = 'block';
+            tunerView.style.display = 'none';
+            label.textContent = 'Output Analyzer';
+            btn.textContent = 'Tuner';
+        }
+    });
 
     async function initAudioContext() {
         if (!audioCtx) {
@@ -721,7 +797,8 @@
 
     function runTuner() {
         const buffer = new Float32Array(tunerAnalyser.fftSize);
-        const display = document.getElementById('tuner-display');
+        const noteDisplay = document.getElementById('tuner-note');
+        const indicator = document.getElementById('tuner-meter-indicator');
         
         function update() {
             requestAnimationFrame(update);
@@ -729,8 +806,11 @@
             let freq = autoCorrelate(buffer, audioCtx.sampleRate);
             
             if (freq === -1 || isNaN(freq) || freq > 4000) {
-                display.textContent = "Tuner: --";
-                display.style.color = "#00ffcc";
+                noteDisplay.textContent = "--";
+                noteDisplay.style.color = "#00ffcc";
+                indicator.style.left = '50%';
+                indicator.style.backgroundColor = '#00ffcc';
+                indicator.style.boxShadow = '0 0 6px #00ffcc';
             } else {
                 const notes = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
                 const A4 = 440;
@@ -741,14 +821,25 @@
                 let exactFreq = A4 * Math.pow(2, halfSteps / 12);
                 let cents = 1200 * Math.log2(freq / exactFreq);
                 
-                display.textContent = `${notes[noteIndex]} (${Math.round(freq)}Hz)`;
+                noteDisplay.textContent = `${notes[noteIndex]} (${Math.round(freq)}Hz)`;
                 
+                let position = 50 + cents;
+                if (position < 0) position = 0;
+                if (position > 100) position = 100;
+                indicator.style.left = `${position}%`;
+
                 if (Math.abs(cents) < 10) {
-                    display.style.color = "#00ffcc"; 
+                    noteDisplay.style.color = "#00ffcc"; 
+                    indicator.style.backgroundColor = "#00ffcc";
+                    indicator.style.boxShadow = '0 0 6px #00ffcc';
                 } else if (Math.abs(cents) < 25) {
-                    display.style.color = "#ffeb3b"; 
+                    noteDisplay.style.color = "#ffeb3b"; 
+                    indicator.style.backgroundColor = "#ffeb3b";
+                    indicator.style.boxShadow = '0 0 6px #ffeb3b';
                 } else {
-                    display.style.color = "#ff5252"; 
+                    noteDisplay.style.color = "#ff5252"; 
+                    indicator.style.backgroundColor = "#ff5252";
+                    indicator.style.boxShadow = '0 0 6px #ff5252';
                 }
             }
         }
@@ -763,6 +854,9 @@
 
         function draw() {
             requestAnimationFrame(draw);
+            // キャンバスが非表示の時は描画をスキップして負荷を軽減
+            if (currentPreviewMode !== 'waveform') return;
+
             if(canvas.width !== canvas.clientWidth) canvas.width = canvas.clientWidth;
             if(canvas.height !== canvas.clientHeight) canvas.height = canvas.clientHeight;
 
@@ -905,30 +999,26 @@
             onChange(val);
         }
 
-        // ノイズゲート (Noise Gate) の追加実装（修正版：マイルドな感度とソフトニー減衰）
         if (type === 'noisegate') {
             const ws = audioCtx.createWaveShaper();
             inNode.connect(ws); ws.connect(wetGain);
 
-            let threshold = 0.003;
+            let threshold = 0.02;
             updateParams = () => {
                 const n_samples = 44100;
                 const curve = new Float32Array(n_samples);
                 for (let i = 0; i < n_samples; ++i) {
                     let x = i * 2 / n_samples - 1;
-                    let absX = Math.abs(x);
-                    if (absX < threshold) {
-                        // 急激なカットオフを避け、ソフトニー的に滑らかに減衰させて歪みを防止
-                        curve[i] = Math.sign(x) * Math.pow(absX / threshold, 2) * threshold * 0.5;
+                    if (Math.abs(x) < threshold) {
+                        curve[i] = 0;
                     } else {
-                        // スレッショルド以上は滑らかに接続
-                        curve[i] = Math.sign(x) * (absX - threshold * 0.5) / (1 - threshold * 0.5);
+                        curve[i] = Math.sign(x) * (Math.abs(x) - threshold) / (1 - threshold);
                     }
                 }
                 ws.curve = curve;
             };
 
-            addKnob('THRESH', 0.0, 0.05, 0.001, threshold, v => { threshold = v; updateParams(); });
+            addKnob('THRESH', 0.0, 0.2, 0.005, threshold, v => { threshold = v; updateParams(); });
         } else if (type === 'comp') {
             const comp = audioCtx.createDynamicsCompressor();
             const level = audioCtx.createGain();
