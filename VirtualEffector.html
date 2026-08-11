@@ -905,28 +905,30 @@
             onChange(val);
         }
 
-        // ノイズゲート (Noise Gate) の追加実装
+        // ノイズゲート (Noise Gate) の追加実装（修正版：マイルドな感度とソフトニー減衰）
         if (type === 'noisegate') {
             const ws = audioCtx.createWaveShaper();
             inNode.connect(ws); ws.connect(wetGain);
 
-            let threshold = 0.02;
+            let threshold = 0.003;
             updateParams = () => {
                 const n_samples = 44100;
                 const curve = new Float32Array(n_samples);
                 for (let i = 0; i < n_samples; ++i) {
                     let x = i * 2 / n_samples - 1;
-                    if (Math.abs(x) < threshold) {
-                        curve[i] = 0;
+                    let absX = Math.abs(x);
+                    if (absX < threshold) {
+                        // 急激なカットオフを避け、ソフトニー的に滑らかに減衰させて歪みを防止
+                        curve[i] = Math.sign(x) * Math.pow(absX / threshold, 2) * threshold * 0.5;
                     } else {
-                        // クリップノイズを防ぐため、スレッショルド以上は滑らかに繋ぐ
-                        curve[i] = Math.sign(x) * (Math.abs(x) - threshold) / (1 - threshold);
+                        // スレッショルド以上は滑らかに接続
+                        curve[i] = Math.sign(x) * (absX - threshold * 0.5) / (1 - threshold * 0.5);
                     }
                 }
                 ws.curve = curve;
             };
 
-            addKnob('THRESH', 0.0, 0.2, 0.005, threshold, v => { threshold = v; updateParams(); });
+            addKnob('THRESH', 0.0, 0.05, 0.001, threshold, v => { threshold = v; updateParams(); });
         } else if (type === 'comp') {
             const comp = audioCtx.createDynamicsCompressor();
             const level = audioCtx.createGain();
