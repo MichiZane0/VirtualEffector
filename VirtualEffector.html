@@ -85,13 +85,13 @@
         text-overflow: ellipsis;
     }
     select, button {
-        padding: 12px 16px;
+        padding: 10px 14px;
         background: linear-gradient(to bottom, #333, #222);
         color: #e0e0e0;
         border: 1px solid #111;
         border-top: 1px solid #555;
         border-radius: 4px;
-        font-size: 13px;
+        font-size: 12px;
         font-weight: 600;
         cursor: pointer;
         max-width: 100%;
@@ -115,15 +115,15 @@
     
     .btn-group {
         display: flex;
-        gap: 10px;
+        gap: 8px;
         align-items: center;
         flex-wrap: wrap;
     }
 
     .preset-select {
         flex: 1;
-        min-width: 120px;
-        max-width: 200px;
+        min-width: 110px;
+        max-width: 170px;
     }
 
     button.play-btn {
@@ -131,8 +131,8 @@
         background: linear-gradient(to bottom, #007acc, #005086);
         color: #fff;
         border-top-color: #33aaff;
-        height: 40px;
-        min-width: 120px;
+        height: 38px;
+        min-width: 100px;
     }
     button.play-btn.playing {
         background: linear-gradient(to bottom, #d32f2f, #9a0007);
@@ -142,8 +142,7 @@
     button.toggle-btn {
         background: linear-gradient(to bottom, #444, #2a2a2a);
         color: #fff;
-        height: 40px;
-        flex-grow: 1;
+        height: 38px;
     }
 
     /* 波形プレビュー＆チューナー（液晶ディスプレイ風） */
@@ -254,7 +253,7 @@
     .palette {
         flex: 1;
         min-width: 220px;
-        max-width: 280px;
+        max-width: 260px;
         background: linear-gradient(to bottom, #2b2b2b, #1a1a1a);
         border: 2px solid #000;
         border-top: 2px solid #444;
@@ -264,13 +263,14 @@
         flex-direction: column;
         gap: 12px;
         box-shadow: 0 10px 20px rgba(0, 0, 0, 0.8);
+        height: fit-content;
     }
     .palette-title {
         font-size: 11px;
         font-weight: 700;
         color: #aaa;
         text-transform: uppercase;
-        margin-bottom: 8px;
+        margin-bottom: 4px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -282,7 +282,7 @@
         border-top: 1px solid #555;
         border-left: 4px solid #555;
         border-radius: 3px;
-        padding: 12px;
+        padding: 10px 12px;
         font-weight: 600;
         font-size: 12px;
         cursor: grab;
@@ -298,15 +298,34 @@
         box-shadow: inset 0 2px 4px rgba(0,0,0,0.8);
     }
 
-    /* ペダルボード（ベルクロ/カーペット風） */
-    .board-container {
+    /* ボードコンテナ（上下2段） */
+    .board-container-wrapper {
         flex: 3;
         min-width: 320px;
         display: flex;
         flex-direction: column;
-        gap: 16px;
+        gap: 20px;
         max-width: 100%;
     }
+
+    .channel-section {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .channel-label {
+        font-size: 12px;
+        font-weight: 700;
+        color: #00ffcc;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        text-shadow: 0 0 4px rgba(0, 255, 204, 0.3);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
     .board {
         /* ベルクロ風テクスチャ */
         background-color: #111;
@@ -317,13 +336,13 @@
         background-position: 0 0, 2px 2px;
         border: 4px solid #2a2a2a;
         border-radius: 6px;
-        min-height: 420px;
-        padding: 24px;
+        min-height: 250px;
+        padding: 16px;
         display: flex;
-        gap: 20px;
+        gap: 16px;
         box-shadow: 
-            inset 0 15px 30px rgba(0, 0, 0, 0.9), 
-            0 10px 20px rgba(0,0,0,0.6);
+            inset 0 10px 20px rgba(0, 0, 0, 0.9), 
+            0 6px 12px rgba(0,0,0,0.6);
         align-items: center;
         position: relative;
         align-content: flex-start;
@@ -338,19 +357,19 @@
         overflow-y: auto;
     }
 
-    .board::-webkit-scrollbar { height: 14px; width: 14px; }
+    .board::-webkit-scrollbar { height: 10px; width: 10px; }
     .board::-webkit-scrollbar-track { background: #111; border: 1px solid #222; }
-    .board::-webkit-scrollbar-thumb { background: #444; border-radius: 7px; border: 3px solid #111; }
+    .board::-webkit-scrollbar-thumb { background: #444; border-radius: 5px; border: 2px solid #111; }
     .board::-webkit-scrollbar-thumb:hover { background: #666; }
 
     .board::before {
-        content: "Drag pedals here";
+        content: "Drop pedals here";
         position: absolute;
         top: 50%; left: 50%;
         transform: translate(-50%, -50%);
         color: #444;
         font-weight: 700;
-        font-size: 20px;
+        font-size: 16px;
         letter-spacing: 2px;
         text-transform: uppercase;
         pointer-events: none;
@@ -372,10 +391,10 @@
         );
         border: 2px dashed #555;
         border-radius: 4px;
-        padding: 16px;
+        padding: 12px;
         text-align: center;
         font-weight: 700;
-        font-size: 13px;
+        font-size: 12px;
         color: #888;
         text-transform: uppercase;
         letter-spacing: 1px;
@@ -393,17 +412,17 @@
 
     /* ペダルデザイン（リアルな筐体風） */
     .pedal {
-        min-width: 170px;
-        width: 170px;
-        height: 310px;
+        min-width: 160px;
+        width: 160px;
+        height: 290px;
         background: linear-gradient(135deg, #3a3a3a, #202020);
         border-radius: 8px;
         display: flex;
         flex-direction: column;
         align-items: center;
-        padding: 16px 12px;
+        padding: 14px 10px;
         box-shadow: 
-            8px 12px 20px rgba(0,0,0,0.7), 
+            6px 10px 16px rgba(0,0,0,0.7), 
             inset 1px 1px 2px rgba(255,255,255,0.1),
             inset -2px -2px 4px rgba(0,0,0,0.6);
         position: relative;
@@ -411,7 +430,6 @@
         flex-shrink: 0;
         border: 1px solid #000;
     }
-    /* ペダルの上部カラー帯を擬似要素で表現 */
     .pedal::before {
         content: '';
         position: absolute;
@@ -427,9 +445,9 @@
     
     .pedal-title {
         font-weight: 800;
-        font-size: 12px;
-        letter-spacing: 1.5px;
-        margin-bottom: 20px;
+        font-size: 11px;
+        letter-spacing: 1px;
+        margin-bottom: 14px;
         margin-top: 4px;
         color: #fff;
         text-align: center;
@@ -439,7 +457,7 @@
         text-overflow: ellipsis;
         text-transform: uppercase;
         background: rgba(0,0,0,0.3);
-        padding: 6px 4px;
+        padding: 5px 4px;
         border-radius: 4px;
         border-bottom: 1px solid rgba(255,255,255,0.1);
         text-shadow: 0 1px 2px #000;
@@ -465,7 +483,7 @@
     .knobs-container {
         display: flex;
         flex-direction: column;
-        gap: 12px;
+        gap: 10px;
         width: 100%;
         flex-grow: 1;
         overflow: hidden;
@@ -479,7 +497,7 @@
         font-size: 9px;
         color: #bbb;
         font-weight: 700;
-        margin-bottom: 4px;
+        margin-bottom: 3px;
         display: flex;
         justify-content: space-between;
         gap: 4px;
@@ -493,17 +511,16 @@
         min-width: 0;
     }
     
-    /* リアルなフェーダー風スライダー */
     input[type=range] {
         -webkit-appearance: none;
         width: 100%;
         background: transparent;
-        margin: 6px 0;
+        margin: 4px 0;
     }
     input[type=range]:focus { outline: none; }
     input[type=range]::-webkit-slider-runnable-track {
         width: 100%; 
-        height: 6px; 
+        height: 5px; 
         cursor: pointer; 
         background: #000; 
         border-radius: 3px; 
@@ -511,72 +528,71 @@
         box-shadow: inset 0 2px 4px rgba(0,0,0,0.9);
     }
     input[type=range]::-webkit-slider-thumb {
-        height: 20px; 
-        width: 14px; 
+        height: 18px; 
+        width: 12px; 
         border-radius: 3px; 
         background: linear-gradient(to bottom, #dcdcdc, #999); 
         cursor: pointer; 
         -webkit-appearance: none; 
-        margin-top: -8px; 
-        box-shadow: 0 3px 5px rgba(0,0,0,0.8), inset 0 1px 1px rgba(255,255,255,0.5); 
+        margin-top: -7px; 
+        box-shadow: 0 2px 4px rgba(0,0,0,0.8), inset 0 1px 1px rgba(255,255,255,0.5); 
         border: 1px solid #111;
     }
     input[type=range]:hover::-webkit-slider-thumb { 
         background: linear-gradient(to bottom, #eee, #aaa); 
     }
 
-    /* フットスイッチ（リアルな金属スイッチ風） */
+    /* フットスイッチ */
     .footswitch-container {
         margin-top: auto;
         display: flex;
         flex-direction: column;
         align-items: center;
         width: 100%;
-        padding-top: 12px;
+        padding-top: 8px;
     }
     .led {
-        width: 10px;
-        height: 10px;
+        width: 8px;
+        height: 8px;
         border-radius: 50%;
         background-color: #222;
         border: 1px solid #000;
-        margin-bottom: 12px;
+        margin-bottom: 8px;
         box-shadow: inset 0px 2px 4px rgba(0,0,0,0.8);
         transition: all 0.1s;
     }
     .led.active {
         background-color: #ff3b30;
         border-color: #ff8a80;
-        box-shadow: 0 0 8px #ff3b30, 0 0 15px #ff3b30, inset 0px 1px 3px rgba(255,255,255,0.6);
+        box-shadow: 0 0 6px #ff3b30, 0 0 12px #ff3b30, inset 0px 1px 3px rgba(255,255,255,0.6);
     }
     .footswitch {
-        width: 44px;
-        height: 44px;
+        width: 38px;
+        height: 38px;
         border-radius: 50%;
         background: radial-gradient(circle, #f0f0f0 0%, #a0a0a0 40%, #555 100%);
         border: 2px solid #222;
         box-shadow: 
-            0 5px 8px rgba(0,0,0,0.8), 
+            0 4px 6px rgba(0,0,0,0.8), 
             inset 0 1px 3px rgba(255,255,255,0.9);
         cursor: pointer;
         outline: none;
         transition: transform 0.05s, box-shadow 0.05s;
         position: relative;
     }
-    /* スイッチ中央の突起部 */
     .footswitch::after {
         content: '';
         position: absolute;
         top: 50%; left: 50%;
         transform: translate(-50%, -50%);
-        width: 22px; height: 22px;
+        width: 18px; height: 18px;
         border-radius: 50%;
         background: radial-gradient(circle, #ddd 0%, #888 100%);
         box-shadow: inset 0 -1px 3px rgba(0,0,0,0.6);
     }
     .footswitch:active {
-        box-shadow: 0 1px 3px rgba(0,0,0,0.9), inset 0 2px 6px rgba(0,0,0,0.9);
-        transform: translateY(3px);
+        box-shadow: 0 1px 2px rgba(0,0,0,0.9), inset 0 2px 6px rgba(0,0,0,0.9);
+        transform: translateY(2px);
     }
     .footswitch:active::after {
         background: radial-gradient(circle, #bbb 0%, #666 100%);
@@ -586,16 +602,16 @@
         display: flex;
         align-items: center;
         background: rgba(0,0,0,0.3);
-        padding: 0 12px;
+        padding: 0 10px;
         border-radius: 4px;
         border: 1px solid #111;
         box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
-        height: 40px;
+        height: 38px;
     }
     .vol-slider-wrap label {
-        font-size: 11px;
+        font-size: 10px;
         color: #ccc;
-        margin-right: 8px;
+        margin-right: 6px;
         font-weight: bold;
     }
 </style>
@@ -608,9 +624,15 @@
     <div class="header-panel">
         <div class="io-section">
             <div class="device-select">
-                <label for="audio-input">Input Source</label>
-                <select id="audio-input">
-                    <option value="none">-- Select Input --</option>
+                <label for="guitar-input">Guitar Input Source</label>
+                <select id="guitar-input">
+                    <option value="none">-- Select Input / None --</option>
+                </select>
+            </div>
+            <div class="device-select">
+                <label for="mic-input">Mic Input Source</label>
+                <select id="mic-input">
+                    <option value="none">-- Select Mic Input --</option>
                 </select>
             </div>
             <div class="device-select">
@@ -634,16 +656,16 @@
                 <button id="play-preset-btn" class="play-btn">Play Track</button>
                 <div class="vol-slider-wrap">
                     <label>VOL</label>
-                    <input type="range" id="preset-volume" min="0" max="1" step="0.01" value="0.5" style="width: 70px;">
+                    <input type="range" id="preset-volume" min="0" max="1" step="0.01" value="0.5" style="width: 50px;">
                 </div>
-                <button id="toggle-view-btn" class="toggle-btn">Toggle View</button>
+                <button id="toggle-view-btn" class="toggle-btn" style="padding: 0 10px;">Wrap</button>
             </div>
         </div>
         
         <div class="preview-section">
             <div class="preview-header">
                 <div class="preview-label" id="preview-label">Output Analyzer</div>
-                <button id="switch-preview-btn" class="toggle-btn" style="height: 24px; padding: 0 12px; font-size: 11px; flex-grow: 0; min-width: auto; line-height: 1;">Tuner</button>
+                <button id="switch-preview-btn" class="toggle-btn" style="height: 24px; padding: 0 10px; font-size: 11px; flex-grow: 0; min-width: auto; line-height: 1;">Tuner</button>
             </div>
             <canvas id="oscilloscope"></canvas>
             <div class="tuner-view" id="tuner-view">
@@ -677,9 +699,16 @@
             <div class="palette-item" draggable="true" data-type="reverb">Studio Reverb</div>
         </div>
 
-        <!-- ボードとゴミ箱 -->
-        <div class="board-container">
-            <div class="board" id="board"></div>
+        <!-- ボードとゴミ箱（上：ギター、下：マイク） -->
+        <div class="board-container-wrapper">
+            <div class="channel-section">
+                <div class="channel-label">Guitar Pedalboard</div>
+                <div class="board" id="board-guitar" data-channel="guitar"></div>
+            </div>
+            <div class="channel-section">
+                <div class="channel-label">Mic Pedalboard</div>
+                <div class="board" id="board-mic" data-channel="mic"></div>
+            </div>
             <div class="trash-bin" id="trash-bin">Drag modules here to remove</div>
         </div>
 
@@ -687,27 +716,30 @@
 
 <script>
     let audioCtx;
-    let masterInputNode;
     let masterOutputNode;
-    let analyser;
-    let analyserOutput;
-    let tunerAnalyser;
     
-    let inputStream;
-    let inputSource;
+    // チャンネルごとのノード
+    let guitarInputNode, guitarBusNode;
+    let micInputNode, micBusNode;
+
+    let analyserOutput, tunerAnalyser;
+    
+    let guitarStream, guitarInputSource;
+    let micStream, micInputSource;
+    
     let presetSource;
     let isPlayingPreset = false;
+    let pVolNode = null;
 
-    let activePedals = [];
+    let activePedals = {
+        guitar: [],
+        mic: []
+    };
     let pedalCounter = 0;
     
     let currentPreviewMode = 'waveform'; // 'waveform' or 'tuner'
-
-    // 音源バッファのキャッシュ用
     const presetCache = {};
-    let pVolNode = null;
 
-    // 波形/チューナー表示切替イベントリスナー
     document.getElementById('switch-preview-btn').addEventListener('click', (e) => {
         const btn = e.target;
         const osc = document.getElementById('oscilloscope');
@@ -731,19 +763,29 @@
 
     async function initAudioContext() {
         if (!audioCtx) {
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)({
+                latencyHint: 'interactive'
+            });
             
-            masterInputNode = audioCtx.createGain();
+            // ギター用バスとマイク用バスを作成
+            guitarInputNode = audioCtx.createGain();
+            guitarBusNode = audioCtx.createGain();
+
+            micInputNode = audioCtx.createGain();
+            micBusNode = audioCtx.createGain();
+
             masterOutputNode = audioCtx.createGain();
             
-            analyser = audioCtx.createAnalyser();
-            analyser.fftSize = 2048;
-            masterInputNode.connect(analyser);
-
+            // チューナー用アナライザー（ギター入力系統を測定）
             tunerAnalyser = audioCtx.createAnalyser();
-            tunerAnalyser.fftSize = 2048; 
-            masterInputNode.connect(tunerAnalyser);
+            tunerAnalyser.fftSize = 2048;
+            guitarInputNode.connect(tunerAnalyser);
 
+            // ミックスしてマスターへ出力
+            guitarBusNode.connect(masterOutputNode);
+            micBusNode.connect(masterOutputNode);
+
+            // 出力用アナライザー
             analyserOutput = audioCtx.createAnalyser();
             analyserOutput.fftSize = 2048;
             masterOutputNode.connect(analyserOutput);
@@ -752,7 +794,8 @@
             
             drawOscilloscope();
             runTuner();
-            rebuildAudioChain();
+            rebuildAudioChain('guitar');
+            rebuildAudioChain('mic');
         }
         if (audioCtx.state === 'suspended') {
             await audioCtx.resume();
@@ -800,17 +843,31 @@
         const noteDisplay = document.getElementById('tuner-note');
         const indicator = document.getElementById('tuner-meter-indicator');
         
+        let lastNoteText = "";
+        let lastIndicatorLeft = "";
+        let lastColor = "";
+        
         function update() {
             requestAnimationFrame(update);
+            if (currentPreviewMode !== 'tuner') return;
+            
             tunerAnalyser.getFloatTimeDomainData(buffer);
             let freq = autoCorrelate(buffer, audioCtx.sampleRate);
             
             if (freq === -1 || isNaN(freq) || freq > 4000) {
-                noteDisplay.textContent = "--";
-                noteDisplay.style.color = "#00ffcc";
-                indicator.style.left = '50%';
-                indicator.style.backgroundColor = '#00ffcc';
-                indicator.style.boxShadow = '0 0 6px #00ffcc';
+                const noFreqText = "--";
+                if (lastNoteText !== noFreqText) {
+                    noteDisplay.textContent = noFreqText;
+                    noteDisplay.style.color = "#00ffcc";
+                    lastNoteText = noFreqText;
+                }
+                if (lastIndicatorLeft !== '50%') {
+                    indicator.style.left = '50%';
+                    indicator.style.backgroundColor = '#00ffcc';
+                    indicator.style.boxShadow = '0 0 6px #00ffcc';
+                    lastIndicatorLeft = '50%';
+                    lastColor = '#00ffcc';
+                }
             } else {
                 const notes = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
                 const A4 = 440;
@@ -821,25 +878,29 @@
                 let exactFreq = A4 * Math.pow(2, halfSteps / 12);
                 let cents = 1200 * Math.log2(freq / exactFreq);
                 
-                noteDisplay.textContent = `${notes[noteIndex]} (${Math.round(freq)}Hz)`;
+                let newNoteText = `${notes[noteIndex]} (${Math.round(freq)}Hz)`;
+                if (lastNoteText !== newNoteText) {
+                    noteDisplay.textContent = newNoteText;
+                    lastNoteText = newNoteText;
+                }
                 
                 let position = 50 + cents;
                 if (position < 0) position = 0;
                 if (position > 100) position = 100;
-                indicator.style.left = `${position}%`;
-
-                if (Math.abs(cents) < 10) {
-                    noteDisplay.style.color = "#00ffcc"; 
-                    indicator.style.backgroundColor = "#00ffcc";
-                    indicator.style.boxShadow = '0 0 6px #00ffcc';
-                } else if (Math.abs(cents) < 25) {
-                    noteDisplay.style.color = "#ffeb3b"; 
-                    indicator.style.backgroundColor = "#ffeb3b";
-                    indicator.style.boxShadow = '0 0 6px #ffeb3b';
-                } else {
-                    noteDisplay.style.color = "#ff5252"; 
-                    indicator.style.backgroundColor = "#ff5252";
-                    indicator.style.boxShadow = '0 0 6px #ff5252';
+                let newLeft = `${position}%`;
+                
+                let newColor = "";
+                if (Math.abs(cents) < 10) newColor = "#00ffcc";
+                else if (Math.abs(cents) < 25) newColor = "#ffeb3b";
+                else newColor = "#ff5252";
+                
+                if (lastIndicatorLeft !== newLeft || lastColor !== newColor) {
+                    indicator.style.left = newLeft;
+                    indicator.style.backgroundColor = newColor;
+                    indicator.style.boxShadow = `0 0 6px ${newColor}`;
+                    noteDisplay.style.color = newColor;
+                    lastIndicatorLeft = newLeft;
+                    lastColor = newColor;
                 }
             }
         }
@@ -854,11 +915,13 @@
 
         function draw() {
             requestAnimationFrame(draw);
-            // キャンバスが非表示の時は描画をスキップして負荷を軽減
             if (currentPreviewMode !== 'waveform') return;
 
-            if(canvas.width !== canvas.clientWidth) canvas.width = canvas.clientWidth;
-            if(canvas.height !== canvas.clientHeight) canvas.height = canvas.clientHeight;
+            const currentWidth = canvas.clientWidth;
+            const currentHeight = canvas.clientHeight;
+
+            if(canvas.width !== currentWidth) canvas.width = currentWidth;
+            if(canvas.height !== currentHeight) canvas.height = currentHeight;
 
             analyserOutput.getByteTimeDomainData(dataArray);
             canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
@@ -991,7 +1054,6 @@
             });
             
             preventDragConflict(range);
-            
             group.appendChild(lblContainer);
             group.appendChild(range);
             knobsContainer.appendChild(group);
@@ -1002,75 +1064,57 @@
         if (type === 'noisegate') {
             const ws = audioCtx.createWaveShaper();
             inNode.connect(ws); ws.connect(wetGain);
-
             let threshold = 0.02;
             updateParams = () => {
                 const n_samples = 44100;
                 const curve = new Float32Array(n_samples);
                 for (let i = 0; i < n_samples; ++i) {
                     let x = i * 2 / n_samples - 1;
-                    if (Math.abs(x) < threshold) {
-                        curve[i] = 0;
-                    } else {
-                        curve[i] = Math.sign(x) * (Math.abs(x) - threshold) / (1 - threshold);
-                    }
+                    curve[i] = Math.abs(x) < threshold ? 0 : Math.sign(x) * (Math.abs(x) - threshold) / (1 - threshold);
                 }
                 ws.curve = curve;
             };
-
             addKnob('THRESH', 0.0, 0.2, 0.005, threshold, v => { threshold = v; updateParams(); });
         } else if (type === 'comp') {
             const comp = audioCtx.createDynamicsCompressor();
             const level = audioCtx.createGain();
             inNode.connect(comp); comp.connect(level); level.connect(wetGain);
-
             let thresh = -24, ratio = 12, gain = 1.2;
             updateParams = () => { comp.threshold.value = thresh; comp.ratio.value = ratio; level.gain.value = gain; };
-
             addKnob('THRESH', -60, 0, 1, thresh, v => { thresh = v; updateParams(); });
             addKnob('RATIO', 1, 20, 1, ratio, v => { ratio = v; updateParams(); });
             addKnob('LEVEL', 0, 3, 0.1, gain, v => { gain = v; updateParams(); });
-
         } else if (type === 'autowah') {
             const filter = audioCtx.createBiquadFilter(); filter.type = 'bandpass';
             const lfo = audioCtx.createOscillator(); lfo.type = 'sine';
             const lfoGain = audioCtx.createGain();
             lfo.connect(lfoGain); lfoGain.connect(filter.frequency); lfo.start();
             inNode.connect(filter); filter.connect(wetGain);
-
             let rate = 2.0, depth = 1000, res = 5.0;
             updateParams = () => { lfo.frequency.value = rate; lfoGain.gain.value = depth; filter.frequency.value = 800; filter.Q.value = res; };
-
             addKnob('RATE', 0.1, 10, 0.1, rate, v => { rate = v; updateParams(); });
             addKnob('DEPTH', 100, 2000, 10, depth, v => { depth = v; updateParams(); });
             addKnob('RES', 1, 20, 1, res, v => { res = v; updateParams(); });
-
         } else if (type === 'od' || type === 'dist') {
             const ws = audioCtx.createWaveShaper();
             const filter = audioCtx.createBiquadFilter(); filter.type = 'lowpass';
             const level = audioCtx.createGain();
             inNode.connect(ws); ws.connect(filter); filter.connect(level); level.connect(wetGain);
-
             let currentDrive = type==='od'? 20 : 60;
             let currentTone = type==='od'? 2000 : 1500;
             let currentLevel = type==='od'? 0.2 : 0.5; 
             const cType = type === 'od' ? 'soft' : 'hard';
-
             updateParams = () => { ws.curve = makeDistortionCurve(currentDrive, cType); filter.frequency.value = currentTone; level.gain.value = currentLevel; };
-
             addKnob(type==='od'?'DRIVE':'DIST', 1, 100, 1, currentDrive, v => { currentDrive = v; updateParams(); });
             addKnob('TONE', 200, 5000, 10, currentTone, v => { currentTone = v; updateParams(); });
             addKnob('LEVEL', 0, 2, 0.1, currentLevel, v => { currentLevel = v; updateParams(); });
-
         } else if (type === 'metal') {
             const preEq = audioCtx.createBiquadFilter(); preEq.type = 'peaking'; preEq.frequency.value = 800; preEq.gain.value = 8;
             const ws = audioCtx.createWaveShaper();
             const postEqLow = audioCtx.createBiquadFilter(); postEqLow.type = 'lowshelf'; postEqLow.frequency.value = 150;
             const postEqHigh = audioCtx.createBiquadFilter(); postEqHigh.type = 'highshelf'; postEqHigh.frequency.value = 3500;
             const level = audioCtx.createGain();
-
             inNode.connect(preEq); preEq.connect(ws); ws.connect(postEqLow); postEqLow.connect(postEqHigh); postEqHigh.connect(level); level.connect(wetGain);
-
             let currentDrive = 80, currentLow = 5, currentHigh = 5, currentLevel = 0.3;
             updateParams = () => {
                 ws.curve = makeDistortionCurve(currentDrive, 'hard');
@@ -1078,40 +1122,31 @@
                 postEqHigh.gain.value = currentHigh;
                 level.gain.value = currentLevel;
             };
-
             addKnob('GAIN', 10, 150, 1, currentDrive, v => { currentDrive = v; updateParams(); });
             addKnob('LOW', -15, 15, 1, currentLow, v => { currentLow = v; updateParams(); });
             addKnob('HIGH', -15, 15, 1, currentHigh, v => { currentHigh = v; updateParams(); });
             addKnob('LEVEL', 0, 2, 0.1, currentLevel, v => { currentLevel = v; updateParams(); });
-
         } else if (type === 'fuzz') {
             const ws = audioCtx.createWaveShaper();
             const level = audioCtx.createGain();
             inNode.connect(ws); ws.connect(level); level.connect(wetGain);
-
             let currentDrive = 60, currentLevel = 0.5;
             updateParams = () => { ws.curve = makeDistortionCurve(currentDrive / 10, 'asym'); level.gain.value = currentLevel; };
-
             addKnob('FUZZ', 10, 150, 1, currentDrive, v => { currentDrive = v; updateParams(); });
             addKnob('LEVEL', 0, 2, 0.1, currentLevel, v => { currentLevel = v; updateParams(); });
-
         } else if (type === 'phaser') {
             const ap1 = audioCtx.createBiquadFilter(); ap1.type = 'allpass';
             const ap2 = audioCtx.createBiquadFilter(); ap2.type = 'allpass';
             const ap3 = audioCtx.createBiquadFilter(); ap3.type = 'allpass';
             const lfo = audioCtx.createOscillator(); lfo.type = 'sine';
             const lfoGain = audioCtx.createGain();
-            lfo.connect(lfoGain);
-            lfoGain.connect(ap1.frequency); lfoGain.connect(ap2.frequency); lfoGain.connect(ap3.frequency);
+            lfo.connect(lfoGain); lfoGain.connect(ap1.frequency); lfoGain.connect(ap2.frequency); lfoGain.connect(ap3.frequency);
             lfo.start();
             inNode.connect(ap1); ap1.connect(ap2); ap2.connect(ap3); ap3.connect(wetGain);
-            
             let rate = 0.5, depth = 600, baseFreq = 1000;
             updateParams = () => { lfo.frequency.value = rate; lfoGain.gain.value = depth; ap1.frequency.value = baseFreq; ap2.frequency.value = baseFreq; ap3.frequency.value = baseFreq; };
-            
             addKnob('RATE', 0.1, 5, 0.1, rate, v => { rate = v; updateParams(); });
             addKnob('DEPTH', 100, 1500, 10, depth, v => { depth = v; updateParams(); });
-
         } else if (type === 'flanger') {
             const delayNode = audioCtx.createDelay(1.0); delayNode.delayTime.value = 0.005; 
             const osc = audioCtx.createOscillator(); osc.type = 'sine';
@@ -1119,68 +1154,51 @@
             const feedbackGain = audioCtx.createGain();
             osc.connect(depthGain); depthGain.connect(delayNode.delayTime); osc.start();
             inNode.connect(delayNode); delayNode.connect(feedbackGain); feedbackGain.connect(delayNode); delayNode.connect(wetGain);
-
             let rate = 0.5, depth = 0.002, fb = 0.5;
             updateParams = () => { osc.frequency.value = rate; depthGain.gain.value = depth; feedbackGain.gain.value = fb; };
-
             addKnob('RATE', 0.1, 5, 0.1, rate, v => { rate = v; updateParams(); });
             addKnob('DEPTH', 0.001, 0.005, 0.001, depth, v => { depth = v; updateParams(); });
             addKnob('F.BACK', 0, 0.9, 0.05, fb, v => { fb = v; updateParams(); });
-
         } else if (type === 'delay') {
             const delayNode = audioCtx.createDelay(2.0);
             const feedbackGain = audioCtx.createGain();
             const levelGain = audioCtx.createGain();
-            const feedbackFilter = audioCtx.createBiquadFilter();
-            feedbackFilter.type = 'lowpass'; feedbackFilter.frequency.value = 2500;
+            const feedbackFilter = audioCtx.createBiquadFilter(); feedbackFilter.type = 'lowpass'; feedbackFilter.frequency.value = 2500;
             const safetyClipper = audioCtx.createWaveShaper(); safetyClipper.curve = makeDistortionCurve(10, 'soft');
-
             inNode.connect(delayNode);
             delayNode.connect(feedbackFilter); feedbackFilter.connect(feedbackGain); safetyClipper.connect(feedbackGain); feedbackGain.connect(delayNode);
             delayNode.connect(levelGain); levelGain.connect(wetGain);
-
             addKnob('TIME', 0.05, 1.0, 0.01, 0.4, v => delayNode.delayTime.value = v);
             addKnob('FEEDBACK', 0, 0.95, 0.01, 0.3, v => feedbackGain.gain.value = v);
             addKnob('MIX', 0, 1, 0.05, 0.4, v => levelGain.gain.value = v);
-
         } else if (type === 'chorus') {
             const delayNode = audioCtx.createDelay(1.0); delayNode.delayTime.value = 0.03;
             const osc = audioCtx.createOscillator(); osc.type = 'sine';
             const depthGain = audioCtx.createGain();
             osc.connect(depthGain); depthGain.connect(delayNode.delayTime); osc.start();
             inNode.connect(delayNode); delayNode.connect(wetGain);
-
             addKnob('RATE', 0.1, 10, 0.1, 1.2, v => osc.frequency.value = v);
             addKnob('DEPTH', 0, 0.05, 0.001, 0.005, v => depthGain.gain.value = v);
-
         } else if (type === 'tremolo') {
             const tremoloGain = audioCtx.createGain(); tremoloGain.gain.value = 0;
             const osc = audioCtx.createOscillator(); osc.type = 'sine';
             const depthGain = audioCtx.createGain();
             osc.connect(depthGain); depthGain.connect(tremoloGain.gain); osc.start();
             inNode.connect(tremoloGain); tremoloGain.connect(wetGain);
-
             let tDepth = 0.6;
             updateParams = () => { tremoloGain.gain.value = 1.0 - (tDepth / 2); depthGain.gain.value = tDepth / 2; };
-
             addKnob('RATE', 0.5, 15, 0.1, 4.0, v => osc.frequency.value = v);
             addKnob('DEPTH', 0, 1, 0.05, tDepth, v => { tDepth = v; updateParams(); });
-
         } else if (type === 'reverb') {
             const convolver = audioCtx.createConvolver();
             convolver.buffer = createReverbImpulse(2.5, 2.0);
             convolver.normalize = true;
             const reverbLevel = audioCtx.createGain();
-            
-            inNode.connect(convolver); 
-            convolver.connect(reverbLevel); 
-            reverbLevel.connect(wetGain);
-            
+            inNode.connect(convolver); convolver.connect(reverbLevel); reverbLevel.connect(wetGain);
             addKnob('MIX', 0, 1, 0.05, 0.6, v => reverbLevel.gain.value = v * 1.5);
         }
 
         updateParams();
-
         const isInsertEffect = ['noisegate', 'comp', 'od', 'dist', 'metal', 'fuzz', 'tremolo', 'phaser', 'autowah'].includes(type);
 
         const switchContainer = document.createElement('div');
@@ -1195,7 +1213,6 @@
         footswitch.addEventListener('click', () => {
             active = !active;
             led.classList.toggle('active', active);
-            
             const now = audioCtx.currentTime;
             if(active) {
                 wetGain.gain.setTargetAtTime(1, now, 0.01);
@@ -1213,7 +1230,8 @@
         el.addEventListener('dragstart', (e) => {
             if (el.draggable === false) { e.preventDefault(); return; }
             el.classList.add('dragging');
-            const data = { source: 'board', id: id };
+            const channel = el.closest('.board').dataset.channel;
+            const data = { source: 'board', id: id, channel: channel };
             e.dataTransfer.setData('text/plain', JSON.stringify(data));
             e.dataTransfer.effectAllowed = 'move';
         });
@@ -1222,30 +1240,36 @@
         return { id, el, inNode, outNode };
     }
 
-    function rebuildAudioChain() {
+    function rebuildAudioChain(channel) {
         if (!audioCtx) return;
 
-        masterInputNode.disconnect();
-        masterInputNode.connect(analyser);
-        masterInputNode.connect(tunerAnalyser); 
-        activePedals.forEach(p => p.outNode.disconnect());
+        const inputNode = channel === 'guitar' ? guitarInputNode : micInputNode;
+        const busNode = channel === 'guitar' ? guitarBusNode : micBusNode;
+        const boardEl = document.getElementById(channel === 'guitar' ? 'board-guitar' : 'board-mic');
 
-        const boardElements = Array.from(document.getElementById('board').children);
+        inputNode.disconnect();
+        if (channel === 'guitar') {
+            inputNode.connect(tunerAnalyser);
+        }
+        activePedals[channel].forEach(p => p.outNode.disconnect());
+
+        const boardElements = Array.from(boardEl.children);
         const currentChain = boardElements
-            .map(el => activePedals.find(p => p.id === el.id))
+            .map(el => activePedals[channel].find(p => p.id === el.id))
             .filter(p => p !== undefined);
 
-        let prevNode = masterInputNode;
+        let prevNode = inputNode;
         currentChain.forEach(pedal => {
             prevNode.connect(pedal.inNode);
             prevNode = pedal.outNode;
         });
 
-        prevNode.connect(masterOutputNode);
-        activePedals = currentChain;
+        prevNode.connect(busNode);
+        activePedals[channel] = currentChain;
     }
 
-    const board = document.getElementById('board');
+    // ドラッグ＆ドロップイベント設定
+    const boards = document.querySelectorAll('.board');
     const trashBin = document.getElementById('trash-bin');
     const paletteItems = document.querySelectorAll('.palette-item');
 
@@ -1257,30 +1281,45 @@
         });
     });
 
-    board.addEventListener('dragover', (e) => { e.preventDefault(); board.classList.add('drag-over'); });
-    board.addEventListener('dragleave', () => board.classList.remove('drag-over'));
+    boards.forEach(board => {
+        board.addEventListener('dragover', (e) => { e.preventDefault(); board.classList.add('drag-over'); });
+        board.addEventListener('dragleave', () => board.classList.remove('drag-over'));
 
-    board.addEventListener('drop', async (e) => {
-        e.preventDefault();
-        board.classList.remove('drag-over');
-        await initAudioContext();
+        board.addEventListener('drop', async (e) => {
+            e.preventDefault();
+            board.classList.remove('drag-over');
+            await initAudioContext();
 
-        try {
-            const data = JSON.parse(e.dataTransfer.getData('text/plain'));
-            if (data.source === 'palette') {
-                const pedal = createPedalInstance(data.type);
-                activePedals.push(pedal);
-                board.appendChild(pedal.el);
-            } else if (data.source === 'board') {
-                const draggedElement = document.getElementById(data.id);
-                if (draggedElement && draggedElement.parentNode === board) {
-                    const afterElement = getDragAfterElement(board, e.clientX);
-                    if (afterElement == null) board.appendChild(draggedElement);
-                    else board.insertBefore(draggedElement, afterElement);
+            const channel = board.dataset.channel;
+
+            try {
+                const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+                if (data.source === 'palette') {
+                    const pedal = createPedalInstance(data.type);
+                    activePedals[channel].push(pedal);
+                    board.appendChild(pedal.el);
+                } else if (data.source === 'board') {
+                    const draggedElement = document.getElementById(data.id);
+                    if (draggedElement) {
+                        const afterElement = getDragAfterElement(board, e.clientX);
+                        if (afterElement == null) board.appendChild(draggedElement);
+                        else board.insertBefore(draggedElement, afterElement);
+                        
+                        // チャンネル間移動の場合の同期
+                        const sourceChannel = data.channel;
+                        if (sourceChannel !== channel) {
+                            const pIndex = activePedals[sourceChannel].findIndex(p => p.id === data.id);
+                            if (pIndex > -1) {
+                                const pedal = activePedals[sourceChannel].splice(pIndex, 1)[0];
+                                activePedals[channel].push(pedal);
+                            }
+                            rebuildAudioChain(sourceChannel);
+                        }
+                    }
                 }
-            }
-            rebuildAudioChain();
-        } catch(err) {}
+                rebuildAudioChain(channel);
+            } catch(err) {}
+        });
     });
 
     function getDragAfterElement(container, x) {
@@ -1302,32 +1341,31 @@
             const data = JSON.parse(e.dataTransfer.getData('text/plain'));
             if (data.source === 'board') {
                 const el = document.getElementById(data.id);
+                const channel = data.channel;
                 if (el) {
                     el.remove();
-                    const pIndex = activePedals.findIndex(p => p.id === data.id);
+                    const pIndex = activePedals[channel].findIndex(p => p.id === data.id);
                     if (pIndex > -1) {
-                        activePedals[pIndex].inNode.disconnect();
-                        activePedals[pIndex].outNode.disconnect();
+                        activePedals[channel][pIndex].inNode.disconnect();
+                        activePedals[channel][pIndex].outNode.disconnect();
                         activePedals.splice(pIndex, 1);
                     }
-                    rebuildAudioChain();
+                    rebuildAudioChain(channel);
                 }
             }
         } catch(err) {}
     });
 
     document.getElementById('toggle-view-btn').addEventListener('click', () => {
-        board.classList.toggle('wrap-mode');
+        boards.forEach(b => b.classList.toggle('wrap-mode'));
     });
 
-    // ========== プリセット音源生成 (改良版 Karplus-Strong) ==========
+    // プリセット音源生成 (Karplus-Strong)
     function generateGuitarBuffer(presetType) {
         const sr = audioCtx.sampleRate;
         let melody = [];
-
         const T_BPM120 = 60/120;
         const T_BPM160 = 60/160;
-        
         const noteFreq = (noteNum) => 440 * Math.pow(2, (noteNum - 69) / 12);
 
         switch (presetType) {
@@ -1383,31 +1421,25 @@
         const bufferLength = sr * (totalDuration + ringOutTime);
         const buffer = audioCtx.createBuffer(1, bufferLength, sr);
         const data = buffer.getChannelData(0);
-        
         let offset = 0;
         
         melody.forEach(note => {
             const period = Math.round(sr / note.freq);
             const delayLine = new Float32Array(period);
-            
             let lastNoise = 0;
             for (let i = 0; i < period; i++) {
                 let noise = Math.random() * 2 - 1;
-                let filteredNoise = (noise + lastNoise) * 0.5;
-                delayLine[i] = filteredNoise;
+                delayLine[i] = (noise + lastNoise) * 0.5;
                 lastNoise = noise;
             }
-            
             const noteSamples = Math.floor(sr * note.dur);
             const ringOutSamples = Math.floor(sr * ringOutTime);
             const decay = 0.996; 
             
             for (let i = 0; i < noteSamples + ringOutSamples; i++) {
                 if (offset + i >= data.length) break;
-                
                 const idx = i % period;
                 const nextIdx = (i + 1) % period;
-                
                 const filtered = 0.5 * (delayLine[idx] + delayLine[nextIdx]);
                 delayLine[idx] = filtered * decay;
                 
@@ -1416,7 +1448,6 @@
                 if (i > (noteSamples + ringOutSamples) - 1000) {
                     env = Math.max(0, ((noteSamples + ringOutSamples) - i) / 1000);
                 }
-                
                 data[offset + i] += (delayLine[idx] * env * 0.7);
             }
             offset += noteSamples;
@@ -1425,15 +1456,12 @@
         let lp = 0, lastLp = 0, dc = 0;
         for (let i = 0; i < data.length; i++) {
             let sample = data[i];
-            
             sample = Math.tanh(sample * 1.5);
             lp = lp + 0.4 * (sample - lp);
             dc = lp - lastLp + 0.995 * dc;
             lastLp = lp;
-            
             data[i] = dc * 0.8; 
         }
-
         return buffer;
     }
 
@@ -1444,7 +1472,7 @@
         await initAudioContext();
         if (!pVolNode) {
             pVolNode = audioCtx.createGain();
-            pVolNode.connect(masterInputNode);
+            pVolNode.connect(guitarInputNode);
         }
         
         if (isPlayingPreset) {
@@ -1458,7 +1486,6 @@
             
             setTimeout(() => {
                 const pType = document.getElementById('preset-selector').value;
-                
                 if (!presetCache[pType]) {
                     presetCache[pType] = generateGuitarBuffer(pType);
                 }
@@ -1484,16 +1511,23 @@
         if(pVolNode) pVolNode.gain.value = parseFloat(e.target.value);
     });
 
+    // デバイス列挙とセットアップ
     navigator.mediaDevices.enumerateDevices().then(devices => {
-        const audioInputSelect = document.getElementById('audio-input');
+        const guitarInputSelect = document.getElementById('guitar-input');
+        const micInputSelect = document.getElementById('mic-input');
         const audioOutputSelect = document.getElementById('audio-output');
         
         devices.forEach(device => {
             if (device.kind === 'audioinput') {
-                const option = document.createElement('option');
-                option.value = device.deviceId;
-                option.text = device.label || `Microphone ${audioInputSelect.length}`;
-                audioInputSelect.appendChild(option);
+                const opt1 = document.createElement('option');
+                opt1.value = device.deviceId;
+                opt1.text = device.label || `Input Device ${guitarInputSelect.length}`;
+                guitarInputSelect.appendChild(opt1);
+
+                const opt2 = document.createElement('option');
+                opt2.value = device.deviceId;
+                opt2.text = device.label || `Mic Device ${micInputSelect.length}`;
+                micInputSelect.appendChild(opt2);
             } else if (device.kind === 'audiooutput') {
                 const option = document.createElement('option');
                 option.value = device.deviceId;
@@ -1502,39 +1536,63 @@
             }
         });
 
-        audioInputSelect.addEventListener('change', async (e) => {
+        // ギター用入力変更
+        guitarInputSelect.addEventListener('change', async (e) => {
             if (e.target.value === 'none') {
-                if (inputStream) {
-                    inputStream.getTracks().forEach(track => track.stop());
-                    inputSource.disconnect();
-                    inputSource = null;
+                if (guitarStream) {
+                    guitarStream.getTracks().forEach(track => track.stop());
+                    guitarInputSource.disconnect();
+                    guitarInputSource = null;
                 }
                 return;
             }
-            
             await initAudioContext();
-            
-            if (inputStream) {
-                inputStream.getTracks().forEach(track => track.stop());
-            }
-            
+            if (guitarStream) guitarStream.getTracks().forEach(track => track.stop());
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({
                     audio: { 
-                        deviceId: e.target.value ? { exact: e.target.value } : undefined,
-                        echoCancellation: false,
-                        noiseSuppression: false,
-                        autoGainControl: false,
-                        latency: 0
+                        deviceId: { exact: e.target.value },
+                        echoCancellation: false, noiseSuppression: false, autoGainControl: false,
+                        channelCount: { ideal: 2 }
                     }
                 });
-                inputStream = stream;
-                inputSource = audioCtx.createMediaStreamSource(stream);
-                inputSource.connect(masterInputNode);
+                guitarStream = stream;
+                guitarInputSource = audioCtx.createMediaStreamSource(stream);
+                guitarInputSource.connect(guitarInputNode);
             } catch (err) {
-                console.error('Error accessing audio input:', err);
-                alert("Could not access microphone/input. Check permissions.");
-                audioInputSelect.value = 'none';
+                console.error('Error accessing guitar input:', err);
+                alert("Could not access guitar input. Check permissions.");
+                guitarInputSelect.value = 'none';
+            }
+        });
+
+        // マイク用入力変更
+        micInputSelect.addEventListener('change', async (e) => {
+            if (e.target.value === 'none') {
+                if (micStream) {
+                    micStream.getTracks().forEach(track => track.stop());
+                    micInputSource.disconnect();
+                    micInputSource = null;
+                }
+                return;
+            }
+            await initAudioContext();
+            if (micStream) micStream.getTracks().forEach(track => track.stop());
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    audio: { 
+                        deviceId: { exact: e.target.value },
+                        echoCancellation: true, noiseSuppression: true, autoGainControl: true,
+                        channelCount: { ideal: 1 }
+                    }
+                });
+                micStream = stream;
+                micInputSource = audioCtx.createMediaStreamSource(stream);
+                micInputSource.connect(micInputNode);
+            } catch (err) {
+                console.error('Error accessing mic input:', err);
+                alert("Could not access mic input. Check permissions.");
+                micInputSelect.value = 'none';
             }
         });
 
