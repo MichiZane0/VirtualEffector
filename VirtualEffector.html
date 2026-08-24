@@ -178,6 +178,7 @@
         align-items: center;
         margin-bottom: 8px;
         width: 100%;
+        gap: 8px;
     }
     .preview-label {
         font-size: 11px;
@@ -189,6 +190,15 @@
         overflow: hidden;
         text-overflow: ellipsis;
         text-shadow: 0 0 4px rgba(0, 255, 204, 0.4);
+    }
+    .analyzer-info {
+        display: flex;
+        gap: 12px;
+        font-size: 11px;
+        font-family: monospace;
+        color: #00ffcc;
+        text-shadow: 0 0 4px rgba(0, 255, 204, 0.4);
+        white-space: nowrap;
     }
     canvas {
         background: transparent;
@@ -641,7 +651,7 @@
                     </select>
                 </div>
                 
-                <!-- 新設：確実な分離を行うためのルーティング指定 -->
+                <!-- 入力ルーティング指定 -->
                 <div class="device-select">
                     <label for="routing-mode">Input Routing</label>
                     <select id="routing-mode">
@@ -682,6 +692,10 @@
         <div class="preview-section">
             <div class="preview-header">
                 <div class="preview-label" id="preview-label">Output Analyzer</div>
+                <div class="analyzer-info">
+                    <span id="analyzer-chord">Chord: --</span>
+                    <span id="analyzer-latency">Latency: -- ms</span>
+                </div>
                 <button id="switch-preview-btn" class="toggle-btn" style="height: 24px; padding: 0 10px; font-size: 11px; flex-grow: 0; min-width: auto; line-height: 1;">Tuner</button>
             </div>
             <canvas id="oscilloscope"></canvas>
@@ -852,6 +866,40 @@
         return sampleRate / t0;
     }
 
+    function detectChord(freqs) {
+        if (!freqs || freqs.length === 0) return "--";
+        const notes = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+        const A4 = 440;
+        
+        // 周波数からノート名への簡易マッピングと重複排除
+        const detectedNotesSet = new Set();
+        freqs.forEach(f => {
+            if (f > 50 && f < 1500) {
+                let halfSteps = Math.round(12 * Math.log2(f / A4));
+                let noteIndex = (halfSteps + 9) % 12;
+                if (noteIndex < 0) noteIndex += 12;
+                detectedNotesSet.add(notes[noteIndex]);
+            }
+        });
+        
+        const nList = Array.from(detectedNotesSet);
+        if (nList.length === 0) return "--";
+        if (nList.length === 1) return nList[0] + " (Single)";
+        
+        // 簡易的なコード判定ロジック例
+        const root = nList[0];
+        if (nList.includes("E") && nList.includes("G#") && nList.includes("B")) return "Emaj";
+        if (nList.includes("E") && nList.includes("G") && nList.includes("B")) return "Emin";
+        if (nList.includes("A") && nList.includes("C#") && nList.includes("E")) return "Amaj";
+        if (nList.includes("A") && nList.includes("C") && nList.includes("E")) return "Amin";
+        if (nList.includes("D") && nList.includes("F#") && nList.includes("A")) return "Dmaj";
+        if (nList.includes("D") && nList.includes("F") && nList.includes("A")) return "Dmin";
+        if (nList.includes("G") && nList.includes("B") && nList.includes("D")) return "Gmaj";
+        if (nList.includes("C") && nList.includes("E") && nList.includes("G")) return "Cmaj";
+        
+        return root + " chord";
+    }
+
     function runTuner() {
         const buffer = new Float32Array(tunerAnalyser.fftSize);
         const noteDisplay = document.getElementById('tuner-note');
@@ -926,6 +974,12 @@
         const canvasCtx = canvas.getContext('2d');
         const bufferLength = analyserOutput.frequencyBinCount;
         const dataArray = new Uint8Array(bufferLength);
+        const floatArray = new Float32Array(bufferLength);
+
+        const chordElem = document.getElementById('analyzer-chord');
+        const latencyElem = document.getElementById('analyzer-latency');
+        
+        let frameCount = 0;
 
         function draw() {
             requestAnimationFrame(draw);
@@ -938,6 +992,23 @@
             if(canvas.height !== currentHeight) canvas.height = currentHeight;
 
             analyserOutput.getByteTimeDomainData(dataArray);
+            
+            // レイテンシおよびコード推定の更新（毎フレームではなく負荷軽減のため間引く）
+            frameCount++;
+            if (frameCount % 20 === 0) {
+                // レイテンシ表示 (AudioContextのbaseLatency/outputLatency、または推定値)
+                let baseLat = (audioCtx.baseLatency || 0) * 1000;
+                let outLat = (audioCtx.outputLatency || 0) * 1000;
+                let totalLat = Math.round(baseLat + outLat);
+                if (totalLat === 0) totalLat = Math.round((bufferLength / audioCtx.sampleRate) * 1000); // フォールバック
+                latencyElem.textContent = `Latency: ${totalLat} ms`;
+
+                // コード表示用周波数解析
+                analyserOutput.getFloatTimeDomainData(floatArray);
+                let f = autoCorrelate(floatArray, audioCtx.sampleRate);
+                chordElem.textContent = `Chord: ${detectChord(f > 0 ? [f] : [])}`;
+            }
+
             canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
 
             canvasCtx.lineWidth = 2;
@@ -1523,7 +1594,7 @@
         if(pVolNode) pVolNode.gain.value = parseFloat(e.target.value);
     });
 
-    // 確実なオーディオルーティングを適用する関数
+    // 確実なオーディオルーティング（Ch1/Ch2の個別分離・独立処理）を適用する関数
     function applyAudioRouting() {
         if (!inputStream || !inputSourceNode) return;
         
@@ -1534,27 +1605,26 @@
         const mode = document.getElementById('routing-mode').value;
         const micBoardSection = document.getElementById('mic-board-section');
 
-        // チャンネル分割用ノードを作成 (最低2チャンネル分確保)
+        // チャンネル分割用ノードを作成 (ステレオ入力を想定して2チャンネルに分離)
         channelSplitter = audioCtx.createChannelSplitter(2);
         inputSourceNode.connect(channelSplitter);
 
         if (mode === 'mono') {
             // モノラル/単一楽器モード（マイクボード非表示）
             micBoardSection.style.display = 'none';
-            channelSplitter.connect(guitarInputNode, 0); // 左Chだけをギターに送信
-            // 右Chはどこにも繋がないため混線しない
+            channelSplitter.connect(guitarInputNode, 0); // Ch1/Mono -> ギターペダルボードへ
             
         } else if (mode === 'split-gm') {
             // ステレオ分離モード (Ch1=ギター, Ch2=マイク)
             micBoardSection.style.display = 'flex';
-            channelSplitter.connect(guitarInputNode, 0); // L -> ギター
-            channelSplitter.connect(micInputNode, 1);    // R -> マイク
+            channelSplitter.connect(guitarInputNode, 0); // Ch1 -> ギターペダルボードへ
+            channelSplitter.connect(micInputNode, 1);    // Ch2 -> マイクペダルボードへ
             
         } else if (mode === 'split-mg') {
             // ステレオ分離モード・反転 (Ch1=マイク, Ch2=ギター)
             micBoardSection.style.display = 'flex';
-            channelSplitter.connect(micInputNode, 0);    // L -> マイク
-            channelSplitter.connect(guitarInputNode, 1); // R -> ギター
+            channelSplitter.connect(micInputNode, 0);    // Ch1 -> マイクペダルボードへ
+            channelSplitter.connect(guitarInputNode, 1); // Ch2 -> ギターペダルボードへ
         }
     }
 
