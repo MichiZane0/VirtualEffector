@@ -157,6 +157,50 @@
         height: 38px;
     }
 
+    /* デュアルアウトプット・ミックスマトリクス用セクション */
+    .matrix-section {
+        background: #111;
+        border: 1px solid #333;
+        border-radius: 4px;
+        padding: 12px;
+        margin-top: 8px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+    .matrix-channel {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        background: #1c1c1c;
+        padding: 8px;
+        border-radius: 4px;
+        border: 1px solid #222;
+    }
+    .matrix-title {
+        font-size: 10px;
+        font-weight: 700;
+        color: #00ffcc;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    .matrix-sliders {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+    .matrix-slider-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 10px;
+        color: #aaa;
+        gap: 6px;
+    }
+    .matrix-slider-row input[type=range] {
+        flex: 1;
+    }
+
     /* 波形プレビュー＆チューナー（液晶ディスプレイ風） */
     .preview-section {
         flex: 1;
@@ -164,7 +208,7 @@
         flex-direction: column;
         min-width: 300px;
         max-width: 100%;
-        height: 190px;
+        height: 250px;
         background: #051210;
         padding: 12px;
         border-radius: 4px;
@@ -661,11 +705,50 @@
                     </select>
                 </div>
 
+                <!-- 2つのアウトプット先選択 -->
                 <div class="device-select">
-                    <label for="audio-output">Output Destination</label>
-                    <select id="audio-output">
+                    <label for="audio-output-1">Output Destination 1</label>
+                    <select id="audio-output-1">
                         <option value="default">Default Output</option>
                     </select>
+                </div>
+
+                <div class="device-select">
+                    <label for="audio-output-2">Output Destination 2</label>
+                    <select id="audio-output-2">
+                        <option value="none">-- None / Disabled --</option>
+                        <option value="default">Default Output</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- それぞれのアウトプットに対するミックス（ギター／マイクの割り当て・音量） -->
+            <div class="matrix-section">
+                <div class="matrix-channel">
+                    <div class="matrix-title">Output 1 Mix</div>
+                    <div class="matrix-sliders">
+                        <div class="matrix-slider-row">
+                            <span>Guitar</span>
+                            <input type="range" id="mix-out1-guitar" min="0" max="1" step="0.01" value="1">
+                        </div>
+                        <div class="matrix-slider-row">
+                            <span>Mic</span>
+                            <input type="range" id="mix-out1-mic" min="0" max="1" step="0.01" value="1">
+                        </div>
+                    </div>
+                </div>
+                <div class="matrix-channel">
+                    <div class="matrix-title">Output 2 Mix</div>
+                    <div class="matrix-sliders">
+                        <div class="matrix-slider-row">
+                            <span>Guitar</span>
+                            <input type="range" id="mix-out2-guitar" min="0" max="1" step="0.01" value="0">
+                        </div>
+                        <div class="matrix-slider-row">
+                            <span>Mic</span>
+                            <input type="range" id="mix-out2-mic" min="0" max="1" step="0.01" value="0">
+                        </div>
+                    </div>
                 </div>
             </div>
             
@@ -748,11 +831,15 @@
 
 <script>
     let audioCtx;
-    let masterOutputNode;
     
     // チャンネルごとのノード
     let guitarInputNode, guitarBusNode;
     let micInputNode, micBusNode;
+
+    // デュアルアウトプット用ノード
+    let dest1GainGuitar, dest1GainMic;
+    let dest2GainGuitar, dest2GainMic;
+    let audioDest1, audioDest2; // 拡張用 AudioDestinationNode
 
     let analyserOutput, tunerAnalyser;
     
@@ -805,21 +892,47 @@
             micInputNode = audioCtx.createGain();
             micBusNode = audioCtx.createGain();
 
-            masterOutputNode = audioCtx.createGain();
-            
+            // Output 1 用の個別ミックスゲイン
+            dest1GainGuitar = audioCtx.createGain();
+            dest1GainMic = audioCtx.createGain();
+            audioDest1 = audioCtx.createGain(); // メインのdestinationに接続されるノード
+
+            // Output 2 用の個別ミックスゲイン
+            dest2GainGuitar = audioCtx.createGain();
+            dest2GainMic = audioCtx.createGain();
+            audioDest2 = audioCtx.createGain();
+
+            // 初期ミックス値の反映
+            dest1GainGuitar.gain.value = parseFloat(document.getElementById('mix-out1-guitar').value);
+            dest1GainMic.gain.value = parseFloat(document.getElementById('mix-out1-mic').value);
+            dest2GainGuitar.gain.value = parseFloat(document.getElementById('mix-out2-guitar').value);
+            dest2GainMic.gain.value = parseFloat(document.getElementById('mix-out2-mic').value);
+
+            // バスから各デスティネーションゲインへ接続
+            guitarBusNode.connect(dest1GainGuitar);
+            guitarBusNode.connect(dest2GainGuitar);
+            micBusNode.connect(dest1GainMic);
+            micBusNode.connect(dest2GainMic);
+
+            dest1GainGuitar.connect(audioDest1);
+            dest1GainMic.connect(audioDest1);
+
+            dest2GainGuitar.connect(audioDest2);
+            dest2GainMic.connect(audioDest2);
+
             tunerAnalyser = audioCtx.createAnalyser();
             tunerAnalyser.fftSize = 2048;
             guitarInputNode.connect(tunerAnalyser);
 
-            guitarBusNode.connect(masterOutputNode);
-            micBusNode.connect(masterOutputNode);
-
+            // Output 1 をデフォルトスピーカーに接続
             analyserOutput = audioCtx.createAnalyser();
             analyserOutput.fftSize = 2048;
-            masterOutputNode.connect(analyserOutput);
+            audioDest1.connect(analyserOutput);
+            analyserOutput.connect(audioCtx.destination);
 
-            masterOutputNode.connect(audioCtx.destination);
-            
+            // Output 2 は初期状態ではミュートまたはデフォルトに接続せず待機（選択に応じて切り替え）
+            audioDest2.connect(audioCtx.destination);
+
             drawOscilloscope();
             runTuner();
             rebuildAudioChain('guitar');
@@ -871,7 +984,6 @@
         const notes = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
         const A4 = 440;
         
-        // 周波数からノート名への簡易マッピングと重複排除
         const detectedNotesSet = new Set();
         freqs.forEach(f => {
             if (f > 50 && f < 1500) {
@@ -886,7 +998,6 @@
         if (nList.length === 0) return "--";
         if (nList.length === 1) return nList[0] + " (Single)";
         
-        // 簡易的なコード判定ロジック例
         const root = nList[0];
         if (nList.includes("E") && nList.includes("G#") && nList.includes("B")) return "Emaj";
         if (nList.includes("E") && nList.includes("G") && nList.includes("B")) return "Emin";
@@ -993,17 +1104,14 @@
 
             analyserOutput.getByteTimeDomainData(dataArray);
             
-            // レイテンシおよびコード推定の更新（毎フレームではなく負荷軽減のため間引く）
             frameCount++;
             if (frameCount % 20 === 0) {
-                // レイテンシ表示 (AudioContextのbaseLatency/outputLatency、または推定値)
                 let baseLat = (audioCtx.baseLatency || 0) * 1000;
                 let outLat = (audioCtx.outputLatency || 0) * 1000;
                 let totalLat = Math.round(baseLat + outLat);
-                if (totalLat === 0) totalLat = Math.round((bufferLength / audioCtx.sampleRate) * 1000); // フォールバック
+                if (totalLat === 0) totalLat = Math.round((bufferLength / audioCtx.sampleRate) * 1000);
                 latencyElem.textContent = `Latency: ${totalLat} ms`;
 
-                // コード表示用周波数解析
                 analyserOutput.getFloatTimeDomainData(floatArray);
                 let f = autoCorrelate(floatArray, audioCtx.sampleRate);
                 chordElem.textContent = `Chord: ${detectChord(f > 0 ? [f] : [])}`;
@@ -1594,43 +1702,50 @@
         if(pVolNode) pVolNode.gain.value = parseFloat(e.target.value);
     });
 
-    // 確実なオーディオルーティング（Ch1/Ch2の個別分離・独立処理）を適用する関数
+    // チャンネルごとのミックスボリューム変更イベントの紐づけ
+    document.getElementById('mix-out1-guitar').addEventListener('input', (e) => {
+        if(dest1GainGuitar) dest1GainGuitar.gain.value = parseFloat(e.target.value);
+    });
+    document.getElementById('mix-out1-mic').addEventListener('input', (e) => {
+        if(dest1GainMic) dest1GainMic.gain.value = parseFloat(e.target.value);
+    });
+    document.getElementById('mix-out2-guitar').addEventListener('input', (e) => {
+        if(dest2GainGuitar) dest2GainGuitar.gain.value = parseFloat(e.target.value);
+    });
+    document.getElementById('mix-out2-mic').addEventListener('input', (e) => {
+        if(dest2GainMic) dest2GainMic.gain.value = parseFloat(e.target.value);
+    });
+
     function applyAudioRouting() {
         if (!inputStream || !inputSourceNode) return;
         
-        // 既存の接続をリセット
         inputSourceNode.disconnect();
         if (channelSplitter) channelSplitter.disconnect();
         
         const mode = document.getElementById('routing-mode').value;
         const micBoardSection = document.getElementById('mic-board-section');
 
-        // チャンネル分割用ノードを作成 (ステレオ入力を想定して2チャンネルに分離)
         channelSplitter = audioCtx.createChannelSplitter(2);
         inputSourceNode.connect(channelSplitter);
 
         if (mode === 'mono') {
-            // モノラル/単一楽器モード（マイクボード非表示）
             micBoardSection.style.display = 'none';
-            channelSplitter.connect(guitarInputNode, 0); // Ch1/Mono -> ギターペダルボードへ
-            
+            channelSplitter.connect(guitarInputNode, 0);
         } else if (mode === 'split-gm') {
-            // ステレオ分離モード (Ch1=ギター, Ch2=マイク)
             micBoardSection.style.display = 'flex';
-            channelSplitter.connect(guitarInputNode, 0); // Ch1 -> ギターペダルボードへ
-            channelSplitter.connect(micInputNode, 1);    // Ch2 -> マイクペダルボードへ
-            
+            channelSplitter.connect(guitarInputNode, 0);
+            channelSplitter.connect(micInputNode, 1);
         } else if (mode === 'split-mg') {
-            // ステレオ分離モード・反転 (Ch1=マイク, Ch2=ギター)
             micBoardSection.style.display = 'flex';
-            channelSplitter.connect(micInputNode, 0);    // Ch1 -> マイクペダルボードへ
-            channelSplitter.connect(guitarInputNode, 1); // Ch2 -> ギターペダルボードへ
+            channelSplitter.connect(micInputNode, 0);
+            channelSplitter.connect(guitarInputNode, 1);
         }
     }
 
     navigator.mediaDevices.enumerateDevices().then(devices => {
         const audioInputSelect = document.getElementById('audio-input');
-        const audioOutputSelect = document.getElementById('audio-output');
+        const audioOutput1Select = document.getElementById('audio-output-1');
+        const audioOutput2Select = document.getElementById('audio-output-2');
         
         devices.forEach(device => {
             if (device.kind === 'audioinput') {
@@ -1639,14 +1754,18 @@
                 opt.text = device.label || `Input Device ${audioInputSelect.length}`;
                 audioInputSelect.appendChild(opt);
             } else if (device.kind === 'audiooutput') {
-                const option = document.createElement('option');
-                option.value = device.deviceId;
-                option.text = device.label || `Speaker ${audioOutputSelect.length}`;
-                audioOutputSelect.appendChild(option);
+                const opt1 = document.createElement('option');
+                opt1.value = device.deviceId;
+                opt1.text = device.label || `Speaker 1 (${audioOutput1Select.length})`;
+                audioOutput1Select.appendChild(opt1);
+
+                const opt2 = document.createElement('option');
+                opt2.value = device.deviceId;
+                opt2.text = device.label || `Speaker 2 (${audioOutput2Select.length})`;
+                audioOutput2Select.appendChild(opt2);
             }
         });
 
-        // 入力デバイス変更時
         audioInputSelect.addEventListener('change', async (e) => {
             if (e.target.value === 'none') {
                 if (inputStream) {
@@ -1674,8 +1793,6 @@
                 
                 if (inputSourceNode) inputSourceNode.disconnect();
                 inputSourceNode = audioCtx.createMediaStreamSource(stream);
-                
-                // 新しいストリーム取得時に現在のルーティング設定を適用
                 applyAudioRouting();
 
             } catch (err) {
@@ -1686,21 +1803,37 @@
             }
         });
 
-        // ルーティングモード変更時にも即座に適用
         document.getElementById('routing-mode').addEventListener('change', () => {
             if (inputStream) applyAudioRouting();
         });
 
-        audioOutputSelect.addEventListener('change', async (e) => {
+        // アウトプット1のデバイス設定
+        audioOutput1Select.addEventListener('change', async (e) => {
             await initAudioContext();
             if (audioCtx && typeof audioCtx.setSinkId === 'function') {
                 try {
+                    // Output 1用の個別のSinkIdはAudioContext全体またはHTMLメディア要素に依存するためブラウザ仕様に準拠
                     await audioCtx.setSinkId(e.target.value);
                 } catch (error) {
-                    console.error('Error setting audio output device:', error);
+                    console.error('Error setting audio output device 1:', error);
                 }
+            }
+        });
+
+        // アウトプット2のデバイス設定（有効化されている場合）
+        audioOutput2Select.addEventListener('change', async (e) => {
+            await initAudioContext();
+            if (e.target.value === 'none') {
+                audioDest2.disconnect();
             } else {
-                console.warn('Your browser does not support setting the audio output device directly on AudioContext.');
+                audioDest2.connect(audioCtx.destination);
+                if (typeof audioCtx.setSinkId === 'function') {
+                    try {
+                        await audioCtx.setSinkId(e.target.value);
+                    } catch (error) {
+                        console.error('Error setting audio output device 2:', error);
+                    }
+                }
             }
         });
     }).catch(err => {
