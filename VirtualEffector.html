@@ -623,16 +623,11 @@
     <!-- 制御パネル -->
     <div class="header-panel">
         <div class="io-section">
+            <!-- 統合されたインプットセレクタ -->
             <div class="device-select">
-                <label for="guitar-input">Guitar Input Source</label>
-                <select id="guitar-input">
+                <label for="audio-input">Input Source (Interface)</label>
+                <select id="audio-input">
                     <option value="none">-- Select Input / None --</option>
-                </select>
-            </div>
-            <div class="device-select">
-                <label for="mic-input">Mic Input Source</label>
-                <select id="mic-input">
-                    <option value="none">-- Select Mic Input --</option>
                 </select>
             </div>
             <div class="device-select">
@@ -699,13 +694,14 @@
             <div class="palette-item" draggable="true" data-type="reverb">Studio Reverb</div>
         </div>
 
-        <!-- ボードとゴミ箱（上：ギター、下：マイク） -->
+        <!-- ボードとゴミ箱 -->
         <div class="board-container-wrapper">
             <div class="channel-section">
                 <div class="channel-label">Guitar Pedalboard</div>
                 <div class="board" id="board-guitar" data-channel="guitar"></div>
             </div>
-            <div class="channel-section">
+            <!-- 条件によって表示・非表示を切り替えるマイクペダルボード -->
+            <div class="channel-section" id="mic-board-section" style="display: none;">
                 <div class="channel-label">Mic Pedalboard</div>
                 <div class="board" id="board-mic" data-channel="mic"></div>
             </div>
@@ -724,8 +720,8 @@
 
     let analyserOutput, tunerAnalyser;
     
-    let guitarStream, guitarInputSource;
-    let micStream, micInputSource;
+    // 単一入力ソースのストリーム情報
+    let inputStream, inputSourceNode, channelSplitter;
     
     let presetSource;
     let isPlayingPreset = false;
@@ -737,7 +733,7 @@
     };
     let pedalCounter = 0;
     
-    let currentPreviewMode = 'waveform'; // 'waveform' or 'tuner'
+    let currentPreviewMode = 'waveform';
     const presetCache = {};
 
     document.getElementById('switch-preview-btn').addEventListener('click', (e) => {
@@ -767,7 +763,6 @@
                 latencyHint: 'interactive'
             });
             
-            // ギター用バスとマイク用バスを作成
             guitarInputNode = audioCtx.createGain();
             guitarBusNode = audioCtx.createGain();
 
@@ -776,16 +771,13 @@
 
             masterOutputNode = audioCtx.createGain();
             
-            // チューナー用アナライザー（ギター入力系統を測定）
             tunerAnalyser = audioCtx.createAnalyser();
             tunerAnalyser.fftSize = 2048;
             guitarInputNode.connect(tunerAnalyser);
 
-            // ミックスしてマスターへ出力
             guitarBusNode.connect(masterOutputNode);
             micBusNode.connect(masterOutputNode);
 
-            // 出力用アナライザー
             analyserOutput = audioCtx.createAnalyser();
             analyserOutput.fftSize = 2048;
             masterOutputNode.connect(analyserOutput);
@@ -1513,21 +1505,15 @@
 
     // デバイス列挙とセットアップ
     navigator.mediaDevices.enumerateDevices().then(devices => {
-        const guitarInputSelect = document.getElementById('guitar-input');
-        const micInputSelect = document.getElementById('mic-input');
+        const audioInputSelect = document.getElementById('audio-input');
         const audioOutputSelect = document.getElementById('audio-output');
         
         devices.forEach(device => {
             if (device.kind === 'audioinput') {
-                const opt1 = document.createElement('option');
-                opt1.value = device.deviceId;
-                opt1.text = device.label || `Input Device ${guitarInputSelect.length}`;
-                guitarInputSelect.appendChild(opt1);
-
-                const opt2 = document.createElement('option');
-                opt2.value = device.deviceId;
-                opt2.text = device.label || `Mic Device ${micInputSelect.length}`;
-                micInputSelect.appendChild(opt2);
+                const opt = document.createElement('option');
+                opt.value = device.deviceId;
+                opt.text = device.label || `Input Device ${audioInputSelect.length}`;
+                audioInputSelect.appendChild(opt);
             } else if (device.kind === 'audiooutput') {
                 const option = document.createElement('option');
                 option.value = device.deviceId;
@@ -1536,63 +1522,63 @@
             }
         });
 
-        // ギター用入力変更
-        guitarInputSelect.addEventListener('change', async (e) => {
+        // 統合されたオーディオ入力変更イベント（チャンネル分離判定）
+        audioInputSelect.addEventListener('change', async (e) => {
             if (e.target.value === 'none') {
-                if (guitarStream) {
-                    guitarStream.getTracks().forEach(track => track.stop());
-                    guitarInputSource.disconnect();
-                    guitarInputSource = null;
+                if (inputStream) {
+                    inputStream.getTracks().forEach(track => track.stop());
+                    if (inputSourceNode) inputSourceNode.disconnect();
+                    if (channelSplitter) channelSplitter.disconnect();
+                    inputStream = null;
                 }
+                document.getElementById('mic-board-section').style.display = 'none';
                 return;
             }
             await initAudioContext();
-            if (guitarStream) guitarStream.getTracks().forEach(track => track.stop());
+            if (inputStream) inputStream.getTracks().forEach(track => track.stop());
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({
                     audio: { 
                         deviceId: { exact: e.target.value },
                         echoCancellation: false, noiseSuppression: false, autoGainControl: false,
-                        channelCount: { ideal: 2 }
+                        channelCount: { ideal: 2 } // 複数チャンネルを要求してインターフェースの能力を確認
                     }
                 });
-                guitarStream = stream;
-                guitarInputSource = audioCtx.createMediaStreamSource(stream);
-                guitarInputSource.connect(guitarInputNode);
-            } catch (err) {
-                console.error('Error accessing guitar input:', err);
-                alert("Could not access guitar input. Check permissions.");
-                guitarInputSelect.value = 'none';
-            }
-        });
+                inputStream = stream;
 
-        // マイク用入力変更
-        micInputSelect.addEventListener('change', async (e) => {
-            if (e.target.value === 'none') {
-                if (micStream) {
-                    micStream.getTracks().forEach(track => track.stop());
-                    micInputSource.disconnect();
-                    micInputSource = null;
+                // 既存のノードをクリア
+                if (inputSourceNode) inputSourceNode.disconnect();
+                if (channelSplitter) channelSplitter.disconnect();
+
+                inputSourceNode = audioCtx.createMediaStreamSource(stream);
+
+                // 取得したストリームのチャンネル数をチェック
+                const trackSettings = stream.getAudioTracks()[0].getSettings();
+                const channels = trackSettings.channelCount || inputSourceNode.channelCount || 1;
+
+                // エラーを防ぐために最低2チャンネルでスプリッターを作成
+                channelSplitter = audioCtx.createChannelSplitter(Math.max(2, channels));
+                inputSourceNode.connect(channelSplitter);
+
+                // Ch 0 (Left) -> ギターに接続
+                channelSplitter.connect(guitarInputNode, 0);
+
+                const micBoardSection = document.getElementById('mic-board-section');
+                // インターフェースがマイクとギターを分離可能（2チャンネル以上）の場合
+                if (channels >= 2) {
+                    // Ch 1 (Right) -> マイクに接続
+                    channelSplitter.connect(micInputNode, 1);
+                    micBoardSection.style.display = 'flex'; // マイクボードを表示
+                } else {
+                    // 1チャンネルのみのインターフェースの場合は非表示のまま
+                    micBoardSection.style.display = 'none';
                 }
-                return;
-            }
-            await initAudioContext();
-            if (micStream) micStream.getTracks().forEach(track => track.stop());
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({
-                    audio: { 
-                        deviceId: { exact: e.target.value },
-                        echoCancellation: true, noiseSuppression: true, autoGainControl: true,
-                        channelCount: { ideal: 1 }
-                    }
-                });
-                micStream = stream;
-                micInputSource = audioCtx.createMediaStreamSource(stream);
-                micInputSource.connect(micInputNode);
+
             } catch (err) {
-                console.error('Error accessing mic input:', err);
-                alert("Could not access mic input. Check permissions.");
-                micInputSelect.value = 'none';
+                console.error('Error accessing audio input:', err);
+                alert("Could not access audio input. Check permissions.");
+                audioInputSelect.value = 'none';
+                document.getElementById('mic-board-section').style.display = 'none';
             }
         });
 
