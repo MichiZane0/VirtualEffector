@@ -157,7 +157,7 @@
         height: 38px;
     }
 
-    /* デュアルアウトプット・ミックスマトリクス用セクション */
+    /* デュアルアウトプット・ミックスマトリクス用セクション（横軸を完全に一致させる） */
     .matrix-section {
         background: #111;
         border: 1px solid #333;
@@ -167,6 +167,7 @@
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 12px;
+        width: 100%;
     }
     .matrix-channel {
         display: flex;
@@ -176,6 +177,7 @@
         padding: 8px;
         border-radius: 4px;
         border: 1px solid #222;
+        width: 100%;
     }
     .matrix-title {
         font-size: 10px;
@@ -188,6 +190,7 @@
         display: flex;
         flex-direction: column;
         gap: 4px;
+        width: 100%;
     }
     .matrix-slider-row {
         display: flex;
@@ -196,9 +199,20 @@
         font-size: 10px;
         color: #aaa;
         gap: 6px;
+        width: 100%;
     }
     .matrix-slider-row input[type=range] {
         flex: 1;
+    }
+
+    /* 右側パネル全体（プレビュー＆メトロノーム） */
+    .right-panel-column {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-width: 300px;
+        max-width: 100%;
+        gap: 12px;
     }
 
     /* 波形プレビュー＆チューナー（液晶ディスプレイ風） */
@@ -208,7 +222,7 @@
         flex-direction: column;
         min-width: 300px;
         max-width: 100%;
-        height: 250px;
+        height: 170px;
         background: #051210;
         padding: 12px;
         border-radius: 4px;
@@ -250,6 +264,54 @@
         flex: 1;
         min-height: 0;
         border: none;
+    }
+
+    /* メトロノームセクション（波形表示の下空白部分に追加） */
+    .metronome-section {
+        background: #111;
+        border: 2px solid #000;
+        border-top: 2px solid #333;
+        border-radius: 4px;
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        box-shadow: inset 0 2px 6px rgba(0,0,0,0.8);
+    }
+    .metronome-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 10px;
+        font-weight: 700;
+        color: #00ffcc;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    .metronome-controls {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        justify-content: space-between;
+    }
+    .metro-led {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background-color: #222;
+        border: 1px solid #000;
+        box-shadow: inset 0 1px 2px rgba(0,0,0,0.8);
+        transition: background-color 0.05s, box-shadow 0.05s;
+    }
+    .metro-led.beat-hi {
+        background-color: #ff3b30;
+        border-color: #ff8a80;
+        box-shadow: 0 0 8px #ff3b30;
+    }
+    .metro-led.beat-lo {
+        background-color: #00ffcc;
+        border-color: #80ffef;
+        box-shadow: 0 0 8px #00ffcc;
     }
 
     /* チューナー専用ビュー */
@@ -696,7 +758,7 @@
                 </div>
                 
                 <!-- 入力ルーティング指定 -->
-                <div class="device-select">
+                <div class="device-select full-width">
                     <label for="routing-mode">Input Routing</label>
                     <select id="routing-mode">
                         <option value="mono">Guitar Only (Ch 1/Mono)</option>
@@ -705,7 +767,7 @@
                     </select>
                 </div>
 
-                <!-- 2つのアウトプット先選択 -->
+                <!-- 2つのアウトプット先選択を独立したグリッドで完全に横軸を揃える -->
                 <div class="device-select">
                     <label for="audio-output-1">Output Destination 1</label>
                     <select id="audio-output-1">
@@ -772,21 +834,41 @@
             </div>
         </div>
         
-        <div class="preview-section">
-            <div class="preview-header">
-                <div class="preview-label" id="preview-label">Output Analyzer</div>
-                <div class="analyzer-info">
-                    <span id="analyzer-chord">Chord: --</span>
-                    <span id="analyzer-latency">Latency: -- ms</span>
+        <!-- 右側カラム（プレビュー ＆ メトロノーム） -->
+        <div class="right-panel-column">
+            <div class="preview-section">
+                <div class="preview-header">
+                    <div class="preview-label" id="preview-label">Output Analyzer</div>
+                    <div class="analyzer-info">
+                        <span id="analyzer-chord">Chord: --</span>
+                        <span id="analyzer-latency">Latency: -- ms</span>
+                    </div>
+                    <button id="switch-preview-btn" class="toggle-btn" style="height: 24px; padding: 0 10px; font-size: 11px; flex-grow: 0; min-width: auto; line-height: 1;">Tuner</button>
                 </div>
-                <button id="switch-preview-btn" class="toggle-btn" style="height: 24px; padding: 0 10px; font-size: 11px; flex-grow: 0; min-width: auto; line-height: 1;">Tuner</button>
+                <canvas id="oscilloscope"></canvas>
+                <div class="tuner-view" id="tuner-view">
+                    <div class="tuner-note" id="tuner-note">--</div>
+                    <div class="tuner-meter">
+                        <div class="tuner-meter-center"></div>
+                        <div class="tuner-meter-indicator" id="tuner-meter-indicator"></div>
+                    </div>
+                </div>
             </div>
-            <canvas id="oscilloscope"></canvas>
-            <div class="tuner-view" id="tuner-view">
-                <div class="tuner-note" id="tuner-note">--</div>
-                <div class="tuner-meter">
-                    <div class="tuner-meter-center"></div>
-                    <div class="tuner-meter-indicator" id="tuner-meter-indicator"></div>
+
+            <!-- メトロノーム機能（波形表示の下空白部分に追加） -->
+            <div class="metronome-section">
+                <div class="metronome-header">
+                    <span>Metronome</span>
+                    <span id="metro-beat-display">Beat: 1 / 4</span>
+                </div>
+                <div class="metronome-controls">
+                    <div class="metro-led" id="metro-led"></div>
+                    <button id="metro-play-btn" class="toggle-btn" style="height: 30px; font-size: 11px; min-width: 70px;">Start</button>
+                    <div class="vol-slider-wrap" style="height: 30px; padding: 0 6px;">
+                        <label style="font-size: 9px;">BPM</label>
+                        <input type="range" id="metro-bpm" min="40" max="240" step="1" value="120" style="width: 60px;">
+                        <span id="metro-bpm-val" style="font-size: 10px; font-family: monospace; margin-left: 4px; min-width: 24px; text-align: right;">120</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -839,7 +921,7 @@
     // デュアルアウトプット用ノード
     let dest1GainGuitar, dest1GainMic;
     let dest2GainGuitar, dest2GainMic;
-    let audioDest1, audioDest2; // 拡張用 AudioDestinationNode
+    let audioDest1, audioDest2;
 
     let analyserOutput, tunerAnalyser;
     
@@ -849,6 +931,12 @@
     let presetSource;
     let isPlayingPreset = false;
     let pVolNode = null;
+
+    // メトロノーム関連変数
+    let isPlayingMetronome = false;
+    let metroTimerId = null;
+    let metroCurrentBeat = 0;
+    let metroBpm = 120;
 
     let activePedals = {
         guitar: [],
@@ -882,8 +970,9 @@
 
     async function initAudioContext() {
         if (!audioCtx) {
+            // 軽量化・低レイテンシ化のため latencyHint を 'playback' に設定
             audioCtx = new (window.AudioContext || window.webkitAudioContext)({
-                latencyHint: 'interactive'
+                latencyHint: 'playback'
             });
             
             guitarInputNode = audioCtx.createGain();
@@ -895,7 +984,7 @@
             // Output 1 用の個別ミックスゲイン
             dest1GainGuitar = audioCtx.createGain();
             dest1GainMic = audioCtx.createGain();
-            audioDest1 = audioCtx.createGain(); // メインのdestinationに接続されるノード
+            audioDest1 = audioCtx.createGain();
 
             // Output 2 用の個別ミックスゲイン
             dest2GainGuitar = audioCtx.createGain();
@@ -930,7 +1019,6 @@
             audioDest1.connect(analyserOutput);
             analyserOutput.connect(audioCtx.destination);
 
-            // Output 2 は初期状態ではミュートまたはデフォルトに接続せず待機（選択に応じて切り替え）
             audioDest2.connect(audioCtx.destination);
 
             drawOscilloscope();
@@ -1105,7 +1193,7 @@
             analyserOutput.getByteTimeDomainData(dataArray);
             
             frameCount++;
-            if (frameCount % 20 === 0) {
+            if (frameCount % 30 === 0) {
                 let baseLat = (audioCtx.baseLatency || 0) * 1000;
                 let outLat = (audioCtx.outputLatency || 0) * 1000;
                 let totalLat = Math.round(baseLat + outLat);
@@ -1142,9 +1230,90 @@
         draw();
     }
 
+    // メトロノームのクリック音を生成して再生する関数
+    function playMetronomeClick(isHigh) {
+        if (!audioCtx) return;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = isHigh ? 1000 : 800;
+
+        const now = audioCtx.currentTime;
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start(now);
+        osc.stop(now + 0.05);
+    }
+
+    // メトロノームのループ処理
+    function startMetronome() {
+        if (isPlayingMetronome) return;
+        isPlayingMetronome = true;
+        metroCurrentBeat = 0;
+
+        const playTick = () => {
+            if (!isPlayingMetronome) return;
+            metroCurrentBeat = (metroCurrentBeat % 4) + 1;
+            const isHigh = (metroCurrentBeat === 1);
+
+            playMetronomeClick(isHigh);
+
+            const led = document.getElementById('metro-led');
+            const beatDisplay = document.getElementById('metro-beat-display');
+            beatDisplay.textContent = `Beat: ${metroCurrentBeat} / 4`;
+            
+            led.className = `metro-led ${isHigh ? 'beat-hi' : 'beat-lo'}`;
+            setTimeout(() => {
+                if (led) led.className = 'metro-led';
+            }, 80);
+
+            const interval = (60 / metroBpm) * 1000;
+            metroTimerId = setTimeout(playTick, interval);
+        };
+
+        playTick();
+    }
+
+    function stopMetronome() {
+        isPlayingMetronome = false;
+        if (metroTimerId) {
+            clearTimeout(metroTimerId);
+            metroTimerId = null;
+        }
+        const led = document.getElementById('metro-led');
+        if (led) led.className = 'metro-led';
+        document.getElementById('metro-beat-display').textContent = `Beat: 1 / 4`;
+    }
+
+    const metroPlayBtn = document.getElementById('metro-play-btn');
+    const metroBpmInput = document.getElementById('metro-bpm');
+    const metroBpmVal = document.getElementById('metro-bpm-val');
+
+    metroPlayBtn.addEventListener('click', async () => {
+        await initAudioContext();
+        if (isPlayingMetronome) {
+            stopMetronome();
+            metroPlayBtn.textContent = 'Start';
+            metroPlayBtn.classList.remove('playing');
+        } else {
+            startMetronome();
+            metroPlayBtn.textContent = 'Stop';
+            metroPlayBtn.classList.add('playing');
+        }
+    });
+
+    metroBpmInput.addEventListener('input', (e) => {
+        metroBpm = parseInt(e.target.value);
+        metroBpmVal.textContent = metroBpm;
+    });
+
     function makeDistortionCurve(amount, type) {
         const k = typeof amount === 'number' ? amount : 50;
-        const n_samples = 44100;
+        const n_samples = 22050; // サンプル数を軽量化
         const curve = new Float32Array(n_samples);
         const deg = Math.PI / 180;
         for (let i = 0; i < n_samples; ++i) {
@@ -1156,7 +1325,7 @@
         return curve;
     }
 
-    function createReverbImpulse(duration = 2.5, decay = 2.0) {
+    function createReverbImpulse(duration = 2.0, decay = 2.0) {
         const sampleRate = audioCtx.sampleRate;
         const length = sampleRate * duration;
         const impulse = audioCtx.createBuffer(2, length, sampleRate);
@@ -1259,7 +1428,7 @@
             inNode.connect(ws); ws.connect(wetGain);
             let threshold = 0.02;
             updateParams = () => {
-                const n_samples = 44100;
+                const n_samples = 22050;
                 const curve = new Float32Array(n_samples);
                 for (let i = 0; i < n_samples; ++i) {
                     let x = i * 2 / n_samples - 1;
@@ -1384,7 +1553,7 @@
             addKnob('DEPTH', 0, 1, 0.05, tDepth, v => { tDepth = v; updateParams(); });
         } else if (type === 'reverb') {
             const convolver = audioCtx.createConvolver();
-            convolver.buffer = createReverbImpulse(2.5, 2.0);
+            convolver.buffer = createReverbImpulse(2.0, 2.0);
             convolver.normalize = true;
             const reverbLevel = audioCtx.createGain();
             inNode.connect(convolver); convolver.connect(reverbLevel); reverbLevel.connect(wetGain);
@@ -1608,7 +1777,7 @@
         }
 
         const totalDuration = melody.reduce((sum, note) => sum + note.dur, 0);
-        const ringOutTime = 1.5; 
+        const ringOutTime = 1.0; 
         const bufferLength = sr * (totalDuration + ringOutTime);
         const buffer = audioCtx.createBuffer(1, bufferLength, sr);
         const data = buffer.getChannelData(0);
@@ -1625,7 +1794,7 @@
             }
             const noteSamples = Math.floor(sr * note.dur);
             const ringOutSamples = Math.floor(sr * ringOutTime);
-            const decay = 0.996; 
+            const decay = 0.994; 
             
             for (let i = 0; i < noteSamples + ringOutSamples; i++) {
                 if (offset + i >= data.length) break;
@@ -1807,12 +1976,10 @@
             if (inputStream) applyAudioRouting();
         });
 
-        // アウトプット1のデバイス設定
         audioOutput1Select.addEventListener('change', async (e) => {
             await initAudioContext();
             if (audioCtx && typeof audioCtx.setSinkId === 'function') {
                 try {
-                    // Output 1用の個別のSinkIdはAudioContext全体またはHTMLメディア要素に依存するためブラウザ仕様に準拠
                     await audioCtx.setSinkId(e.target.value);
                 } catch (error) {
                     console.error('Error setting audio output device 1:', error);
@@ -1820,7 +1987,6 @@
             }
         });
 
-        // アウトプット2のデバイス設定（有効化されている場合）
         audioOutput2Select.addEventListener('change', async (e) => {
             await initAudioContext();
             if (e.target.value === 'none') {
