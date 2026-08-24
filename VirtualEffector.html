@@ -68,12 +68,24 @@
         min-width: 280px;
     }
 
+    /* IOルーティング用レイアウト */
+    .io-controls-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        width: 100%;
+    }
+    
     .device-select {
         display: flex;
         flex-direction: column;
         gap: 6px;
         max-width: 100%;
     }
+    .device-select.full-width {
+        grid-column: 1 / -1;
+    }
+    
     .device-select label {
         font-size: 11px;
         font-weight: 700;
@@ -327,7 +339,6 @@
     }
 
     .board {
-        /* ベルクロ風テクスチャ */
         background-color: #111;
         background-image: 
             radial-gradient(#222 1px, transparent 1px),
@@ -410,7 +421,7 @@
         color: #ff5252;
     }
 
-    /* ペダルデザイン（リアルな筐体風） */
+    /* ペダルデザイン */
     .pedal {
         min-width: 160px;
         width: 160px;
@@ -463,7 +474,6 @@
         text-shadow: 0 1px 2px #000;
     }
 
-    /* 各ペダルのカラーリング */
     .pedal.comp::before { background: #ffd600; }
     .pedal.od::before { background: #ffb300; }
     .pedal.dist::before { background: #e53935; }
@@ -623,18 +633,30 @@
     <!-- 制御パネル -->
     <div class="header-panel">
         <div class="io-section">
-            <!-- 統合されたインプットセレクタ -->
-            <div class="device-select">
-                <label for="audio-input">Input Source (Interface)</label>
-                <select id="audio-input">
-                    <option value="none">-- Select Input / None --</option>
-                </select>
-            </div>
-            <div class="device-select">
-                <label for="audio-output">Output Destination</label>
-                <select id="audio-output">
-                    <option value="default">Default Output</option>
-                </select>
+            <div class="io-controls-grid">
+                <div class="device-select full-width">
+                    <label for="audio-input">Input Source (Interface)</label>
+                    <select id="audio-input">
+                        <option value="none">-- Select Input / None --</option>
+                    </select>
+                </div>
+                
+                <!-- 新設：確実な分離を行うためのルーティング指定 -->
+                <div class="device-select">
+                    <label for="routing-mode">Input Routing</label>
+                    <select id="routing-mode">
+                        <option value="mono">Guitar Only (Ch 1/Mono)</option>
+                        <option value="split-gm">Split: Ch 1=Guitar / Ch 2=Mic</option>
+                        <option value="split-mg">Split: Ch 1=Mic / Ch 2=Guitar</option>
+                    </select>
+                </div>
+
+                <div class="device-select">
+                    <label for="audio-output">Output Destination</label>
+                    <select id="audio-output">
+                        <option value="default">Default Output</option>
+                    </select>
+                </div>
             </div>
             
             <div class="btn-group">
@@ -700,7 +722,7 @@
                 <div class="channel-label">Guitar Pedalboard</div>
                 <div class="board" id="board-guitar" data-channel="guitar"></div>
             </div>
-            <!-- 条件によって表示・非表示を切り替えるマイクペダルボード -->
+            <!-- ルーティング設定に応じて表示を切り替えるマイクボード -->
             <div class="channel-section" id="mic-board-section" style="display: none;">
                 <div class="channel-label">Mic Pedalboard</div>
                 <div class="board" id="board-mic" data-channel="mic"></div>
@@ -720,7 +742,7 @@
 
     let analyserOutput, tunerAnalyser;
     
-    // 単一入力ソースのストリーム情報
+    // ストリーム制御用
     let inputStream, inputSourceNode, channelSplitter;
     
     let presetSource;
@@ -1260,7 +1282,7 @@
         activePedals[channel] = currentChain;
     }
 
-    // ドラッグ＆ドロップイベント設定
+    // ドラッグ＆ドロップ
     const boards = document.querySelectorAll('.board');
     const trashBin = document.getElementById('trash-bin');
     const paletteItems = document.querySelectorAll('.palette-item');
@@ -1297,7 +1319,6 @@
                         if (afterElement == null) board.appendChild(draggedElement);
                         else board.insertBefore(draggedElement, afterElement);
                         
-                        // チャンネル間移動の場合の同期
                         const sourceChannel = data.channel;
                         if (sourceChannel !== channel) {
                             const pIndex = activePedals[sourceChannel].findIndex(p => p.id === data.id);
@@ -1352,7 +1373,6 @@
         boards.forEach(b => b.classList.toggle('wrap-mode'));
     });
 
-    // プリセット音源生成 (Karplus-Strong)
     function generateGuitarBuffer(presetType) {
         const sr = audioCtx.sampleRate;
         let melody = [];
@@ -1503,7 +1523,41 @@
         if(pVolNode) pVolNode.gain.value = parseFloat(e.target.value);
     });
 
-    // デバイス列挙とセットアップ
+    // 確実なオーディオルーティングを適用する関数
+    function applyAudioRouting() {
+        if (!inputStream || !inputSourceNode) return;
+        
+        // 既存の接続をリセット
+        inputSourceNode.disconnect();
+        if (channelSplitter) channelSplitter.disconnect();
+        
+        const mode = document.getElementById('routing-mode').value;
+        const micBoardSection = document.getElementById('mic-board-section');
+
+        // チャンネル分割用ノードを作成 (最低2チャンネル分確保)
+        channelSplitter = audioCtx.createChannelSplitter(2);
+        inputSourceNode.connect(channelSplitter);
+
+        if (mode === 'mono') {
+            // モノラル/単一楽器モード（マイクボード非表示）
+            micBoardSection.style.display = 'none';
+            channelSplitter.connect(guitarInputNode, 0); // 左Chだけをギターに送信
+            // 右Chはどこにも繋がないため混線しない
+            
+        } else if (mode === 'split-gm') {
+            // ステレオ分離モード (Ch1=ギター, Ch2=マイク)
+            micBoardSection.style.display = 'flex';
+            channelSplitter.connect(guitarInputNode, 0); // L -> ギター
+            channelSplitter.connect(micInputNode, 1);    // R -> マイク
+            
+        } else if (mode === 'split-mg') {
+            // ステレオ分離モード・反転 (Ch1=マイク, Ch2=ギター)
+            micBoardSection.style.display = 'flex';
+            channelSplitter.connect(micInputNode, 0);    // L -> マイク
+            channelSplitter.connect(guitarInputNode, 1); // R -> ギター
+        }
+    }
+
     navigator.mediaDevices.enumerateDevices().then(devices => {
         const audioInputSelect = document.getElementById('audio-input');
         const audioOutputSelect = document.getElementById('audio-output');
@@ -1522,7 +1576,7 @@
             }
         });
 
-        // 統合されたオーディオ入力変更イベント（チャンネル分離判定）
+        // 入力デバイス変更時
         audioInputSelect.addEventListener('change', async (e) => {
             if (e.target.value === 'none') {
                 if (inputStream) {
@@ -1534,45 +1588,25 @@
                 document.getElementById('mic-board-section').style.display = 'none';
                 return;
             }
+            
             await initAudioContext();
             if (inputStream) inputStream.getTracks().forEach(track => track.stop());
+            
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({
                     audio: { 
                         deviceId: { exact: e.target.value },
                         echoCancellation: false, noiseSuppression: false, autoGainControl: false,
-                        channelCount: { ideal: 2 } // 複数チャンネルを要求してインターフェースの能力を確認
+                        channelCount: { ideal: 2 }
                     }
                 });
                 inputStream = stream;
-
-                // 既存のノードをクリア
+                
                 if (inputSourceNode) inputSourceNode.disconnect();
-                if (channelSplitter) channelSplitter.disconnect();
-
                 inputSourceNode = audioCtx.createMediaStreamSource(stream);
-
-                // 取得したストリームのチャンネル数をチェック
-                const trackSettings = stream.getAudioTracks()[0].getSettings();
-                const channels = trackSettings.channelCount || inputSourceNode.channelCount || 1;
-
-                // エラーを防ぐために最低2チャンネルでスプリッターを作成
-                channelSplitter = audioCtx.createChannelSplitter(Math.max(2, channels));
-                inputSourceNode.connect(channelSplitter);
-
-                // Ch 0 (Left) -> ギターに接続
-                channelSplitter.connect(guitarInputNode, 0);
-
-                const micBoardSection = document.getElementById('mic-board-section');
-                // インターフェースがマイクとギターを分離可能（2チャンネル以上）の場合
-                if (channels >= 2) {
-                    // Ch 1 (Right) -> マイクに接続
-                    channelSplitter.connect(micInputNode, 1);
-                    micBoardSection.style.display = 'flex'; // マイクボードを表示
-                } else {
-                    // 1チャンネルのみのインターフェースの場合は非表示のまま
-                    micBoardSection.style.display = 'none';
-                }
+                
+                // 新しいストリーム取得時に現在のルーティング設定を適用
+                applyAudioRouting();
 
             } catch (err) {
                 console.error('Error accessing audio input:', err);
@@ -1580,6 +1614,11 @@
                 audioInputSelect.value = 'none';
                 document.getElementById('mic-board-section').style.display = 'none';
             }
+        });
+
+        // ルーティングモード変更時にも即座に適用
+        document.getElementById('routing-mode').addEventListener('change', () => {
+            if (inputStream) applyAudioRouting();
         });
 
         audioOutputSelect.addEventListener('change', async (e) => {
