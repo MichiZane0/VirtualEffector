@@ -157,7 +157,7 @@
         height: 38px;
     }
 
-    /* デュアルアウトプット・ミックスマトリクス用セクション（横軸を完全に一致させる） */
+    /* デュアルアウトプット・ミックスマトリクス用セクション */
     .matrix-section {
         background: #111;
         border: 1px solid #333;
@@ -266,7 +266,7 @@
         border: none;
     }
 
-    /* メトロノームセクション（波形表示の下空白部分に追加） */
+    /* メトロノームセクション */
     .metronome-section {
         background: #111;
         border: 2px solid #000;
@@ -291,8 +291,8 @@
     .metronome-controls {
         display: flex;
         align-items: center;
-        gap: 8px;
-        justify-content: space-between;
+        gap: 12px;
+        justify-content: flex-start;
     }
     .metro-led {
         width: 12px;
@@ -302,6 +302,7 @@
         border: 1px solid #000;
         box-shadow: inset 0 1px 2px rgba(0,0,0,0.8);
         transition: background-color 0.05s, box-shadow 0.05s;
+        flex-shrink: 0;
     }
     .metro-led.beat-hi {
         background-color: #ff3b30;
@@ -426,7 +427,7 @@
         box-shadow: inset 0 2px 4px rgba(0,0,0,0.8);
     }
 
-    /* ボードコンテナ（上下2段） */
+    /* ボードコンテナ */
     .board-container-wrapper {
         flex: 3;
         min-width: 320px;
@@ -740,13 +741,22 @@
         margin-right: 6px;
         font-weight: bold;
     }
+
+    /* 追加：number input のスピンボタン非表示 */
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+    input[type=number] {
+        -moz-appearance: textfield;
+    }
 </style>
 </head>
 <body>
 
     <h1>Professional Virtual Pedalboard</h1>
 
-    <!-- 制御パネル -->
     <div class="header-panel">
         <div class="io-section">
             <div class="io-controls-grid">
@@ -757,7 +767,6 @@
                     </select>
                 </div>
                 
-                <!-- 入力ルーティング指定 -->
                 <div class="device-select full-width">
                     <label for="routing-mode">Input Routing</label>
                     <select id="routing-mode">
@@ -767,7 +776,6 @@
                     </select>
                 </div>
 
-                <!-- 2つのアウトプット先選択を独立したグリッドで完全に横軸を揃える -->
                 <div class="device-select">
                     <label for="audio-output-1">Output Destination 1</label>
                     <select id="audio-output-1">
@@ -784,7 +792,6 @@
                 </div>
             </div>
 
-            <!-- それぞれのアウトプットに対するミックス（ギター／マイクの割り当て・音量） -->
             <div class="matrix-section">
                 <div class="matrix-channel">
                     <div class="matrix-title">Output 1 Mix</div>
@@ -834,7 +841,6 @@
             </div>
         </div>
         
-        <!-- 右側カラム（プレビュー ＆ メトロノーム） -->
         <div class="right-panel-column">
             <div class="preview-section">
                 <div class="preview-header">
@@ -855,7 +861,6 @@
                 </div>
             </div>
 
-            <!-- メトロノーム機能（波形表示の下空白部分に追加） -->
             <div class="metronome-section">
                 <div class="metronome-header">
                     <span>Metronome</span>
@@ -863,21 +868,18 @@
                 </div>
                 <div class="metronome-controls">
                     <div class="metro-led" id="metro-led"></div>
-                    <button id="metro-play-btn" class="toggle-btn" style="height: 30px; font-size: 11px; min-width: 70px;">Start</button>
-                    <div class="vol-slider-wrap" style="height: 30px; padding: 0 6px;">
+                    <button id="metro-play-btn" class="toggle-btn" style="height: 30px; font-size: 11px; min-width: 70px; flex-shrink: 0;">Start</button>
+                    <div class="vol-slider-wrap" style="height: 30px; padding: 0 6px; flex-grow: 1;">
                         <label style="font-size: 9px;">BPM</label>
-                        <input type="range" id="metro-bpm" min="40" max="240" step="1" value="120" style="width: 60px;">
-                        <span id="metro-bpm-val" style="font-size: 10px; font-family: monospace; margin-left: 4px; min-width: 24px; text-align: right;">120</span>
+                        <input type="range" id="metro-bpm" min="40" max="240" step="1" value="120" style="width: 100%; flex-grow: 1;">
+                        <input type="number" id="metro-bpm-val" min="40" max="240" value="120" style="background: transparent; border: none; color: #e0e0e0; font-size: 10px; font-family: monospace; margin-left: 4px; width: 36px; text-align: right; outline: none; box-shadow: none;">
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ワークスペース -->
     <div class="workspace">
-        
-        <!-- エフェクター追加パレット -->
         <div class="palette" id="palette">
             <div class="palette-title">Module Library</div>
             <div class="palette-item" draggable="true" data-type="noisegate">Noise Gate (NG-1)</div>
@@ -895,13 +897,11 @@
             <div class="palette-item" draggable="true" data-type="reverb">Studio Reverb</div>
         </div>
 
-        <!-- ボードとゴミ箱 -->
         <div class="board-container-wrapper">
             <div class="channel-section">
                 <div class="channel-label">Guitar Pedalboard</div>
                 <div class="board" id="board-guitar" data-channel="guitar"></div>
             </div>
-            <!-- ルーティング設定に応じて表示を切り替えるマイクボード -->
             <div class="channel-section" id="mic-board-section" style="display: none;">
                 <div class="channel-label">Mic Pedalboard</div>
                 <div class="board" id="board-mic" data-channel="mic"></div>
@@ -914,34 +914,28 @@
 <script>
     let audioCtx;
     
-    // チャンネルごとのノード
-    let guitarInputNode, guitarBusNode;
-    let micInputNode, micBusNode;
+    // 中間ノード（ChainInNode）を追加し、エフェクト再構築時に入力デバイスとの接続が切れるのを防ぎます
+    let guitarInputNode, guitarChainInNode, guitarBusNode;
+    let micInputNode, micChainInNode, micBusNode;
 
-    // デュアルアウトプット用ノード
     let dest1GainGuitar, dest1GainMic;
     let dest2GainGuitar, dest2GainMic;
     let audioDest1, audioDest2;
 
     let analyserOutput, tunerAnalyser;
     
-    // ストリーム制御用
     let inputStream, inputSourceNode, channelSplitter;
     
     let presetSource;
     let isPlayingPreset = false;
     let pVolNode = null;
 
-    // メトロノーム関連変数
     let isPlayingMetronome = false;
     let metroTimerId = null;
     let metroCurrentBeat = 0;
     let metroBpm = 120;
 
-    let activePedals = {
-        guitar: [],
-        mic: []
-    };
+    let activePedals = { guitar: [], mic: [] };
     let pedalCounter = 0;
     
     let currentPreviewMode = 'waveform';
@@ -970,34 +964,34 @@
 
     async function initAudioContext() {
         if (!audioCtx) {
-            // 軽量化・低レイテンシ化のため latencyHint を 'playback' に設定
+            // 遅延を10ms前後に減らすため、latencyHint を 'interactive' に変更
             audioCtx = new (window.AudioContext || window.webkitAudioContext)({
-                latencyHint: 'playback'
+                latencyHint: 'interactive'
             });
             
             guitarInputNode = audioCtx.createGain();
+            guitarChainInNode = audioCtx.createGain();
             guitarBusNode = audioCtx.createGain();
+            guitarInputNode.connect(guitarChainInNode);
 
             micInputNode = audioCtx.createGain();
+            micChainInNode = audioCtx.createGain();
             micBusNode = audioCtx.createGain();
+            micInputNode.connect(micChainInNode);
 
-            // Output 1 用の個別ミックスゲイン
             dest1GainGuitar = audioCtx.createGain();
             dest1GainMic = audioCtx.createGain();
             audioDest1 = audioCtx.createGain();
 
-            // Output 2 用の個別ミックスゲイン
             dest2GainGuitar = audioCtx.createGain();
             dest2GainMic = audioCtx.createGain();
             audioDest2 = audioCtx.createGain();
 
-            // 初期ミックス値の反映
             dest1GainGuitar.gain.value = parseFloat(document.getElementById('mix-out1-guitar').value);
             dest1GainMic.gain.value = parseFloat(document.getElementById('mix-out1-mic').value);
             dest2GainGuitar.gain.value = parseFloat(document.getElementById('mix-out2-guitar').value);
             dest2GainMic.gain.value = parseFloat(document.getElementById('mix-out2-mic').value);
 
-            // バスから各デスティネーションゲインへ接続
             guitarBusNode.connect(dest1GainGuitar);
             guitarBusNode.connect(dest2GainGuitar);
             micBusNode.connect(dest1GainMic);
@@ -1011,9 +1005,8 @@
 
             tunerAnalyser = audioCtx.createAnalyser();
             tunerAnalyser.fftSize = 2048;
-            guitarInputNode.connect(tunerAnalyser);
+            guitarChainInNode.connect(tunerAnalyser);
 
-            // Output 1 をデフォルトスピーカーに接続
             analyserOutput = audioCtx.createAnalyser();
             analyserOutput.fftSize = 2048;
             audioDest1.connect(analyserOutput);
@@ -1230,7 +1223,6 @@
         draw();
     }
 
-    // メトロノームのクリック音を生成して再生する関数
     function playMetronomeClick(isHigh) {
         if (!audioCtx) return;
         const osc = audioCtx.createOscillator();
@@ -1249,7 +1241,6 @@
         osc.stop(now + 0.05);
     }
 
-    // メトロノームのループ処理
     function startMetronome() {
         if (isPlayingMetronome) return;
         isPlayingMetronome = true;
@@ -1306,14 +1297,34 @@
         }
     });
 
+    // BPMの同期用関数
+    function updateBpm(newBpm) {
+        if (isNaN(newBpm)) return;
+        newBpm = Math.max(40, Math.min(240, newBpm));
+        metroBpm = newBpm;
+        metroBpmInput.value = newBpm;
+        metroBpmVal.value = newBpm;
+    }
+
     metroBpmInput.addEventListener('input', (e) => {
-        metroBpm = parseInt(e.target.value);
-        metroBpmVal.textContent = metroBpm;
+        updateBpm(parseInt(e.target.value));
     });
+
+    // 直接入力イベント
+    metroBpmVal.addEventListener('change', (e) => {
+        updateBpm(parseInt(e.target.value));
+    });
+
+    // ホイールでの微調整
+    metroBpmInput.parentElement.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        const delta = e.deltaY < 0 ? 1 : -1;
+        updateBpm(metroBpm + delta);
+    }, { passive: false });
 
     function makeDistortionCurve(amount, type) {
         const k = typeof amount === 'number' ? amount : 50;
-        const n_samples = 22050; // サンプル数を軽量化
+        const n_samples = 22050; 
         const curve = new Float32Array(n_samples);
         const deg = Math.PI / 180;
         for (let i = 0; i < n_samples; ++i) {
@@ -1527,8 +1538,14 @@
             const levelGain = audioCtx.createGain();
             const feedbackFilter = audioCtx.createBiquadFilter(); feedbackFilter.type = 'lowpass'; feedbackFilter.frequency.value = 2500;
             const safetyClipper = audioCtx.createWaveShaper(); safetyClipper.curve = makeDistortionCurve(10, 'soft');
+            
+            // ディレイのフィードバックループが正しく繋がるように修正
             inNode.connect(delayNode);
-            delayNode.connect(feedbackFilter); feedbackFilter.connect(feedbackGain); safetyClipper.connect(feedbackGain); feedbackGain.connect(delayNode);
+            delayNode.connect(feedbackFilter); 
+            feedbackFilter.connect(safetyClipper); 
+            safetyClipper.connect(feedbackGain); 
+            feedbackGain.connect(delayNode);
+            
             delayNode.connect(levelGain); levelGain.connect(wetGain);
             addKnob('TIME', 0.05, 1.0, 0.01, 0.4, v => delayNode.delayTime.value = v);
             addKnob('FEEDBACK', 0, 0.95, 0.01, 0.3, v => feedbackGain.gain.value = v);
@@ -1602,16 +1619,17 @@
         return { id, el, inNode, outNode };
     }
 
+    // エフェクトグラフを再構築（中間ノード ChainInNode に対して処理を行います）
     function rebuildAudioChain(channel) {
         if (!audioCtx) return;
 
-        const inputNode = channel === 'guitar' ? guitarInputNode : micInputNode;
+        const chainInNode = channel === 'guitar' ? guitarChainInNode : micChainInNode;
         const busNode = channel === 'guitar' ? guitarBusNode : micBusNode;
         const boardEl = document.getElementById(channel === 'guitar' ? 'board-guitar' : 'board-mic');
 
-        inputNode.disconnect();
+        chainInNode.disconnect();
         if (channel === 'guitar') {
-            inputNode.connect(tunerAnalyser);
+            chainInNode.connect(tunerAnalyser);
         }
         activePedals[channel].forEach(p => p.outNode.disconnect());
 
@@ -1620,7 +1638,7 @@
             .map(el => activePedals[channel].find(p => p.id === el.id))
             .filter(p => p !== undefined);
 
-        let prevNode = inputNode;
+        let prevNode = chainInNode;
         currentChain.forEach(pedal => {
             prevNode.connect(pedal.inNode);
             prevNode = pedal.outNode;
@@ -1630,7 +1648,6 @@
         activePedals[channel] = currentChain;
     }
 
-    // ドラッグ＆ドロップ
     const boards = document.querySelectorAll('.board');
     const trashBin = document.getElementById('trash-bin');
     const paletteItems = document.querySelectorAll('.palette-item');
@@ -1871,7 +1888,6 @@
         if(pVolNode) pVolNode.gain.value = parseFloat(e.target.value);
     });
 
-    // チャンネルごとのミックスボリューム変更イベントの紐づけ
     document.getElementById('mix-out1-guitar').addEventListener('input', (e) => {
         if(dest1GainGuitar) dest1GainGuitar.gain.value = parseFloat(e.target.value);
     });
